@@ -1,0 +1,26 @@
+#!/bin/bash
+source /home/adi/android/android_toolchain.sh
+#export ANDROID_NDK=$HOME/Android/Sdk/ndk-bundle
+#export ANDROID_API=28
+echo $TARGET
+echo $ANDROID_API
+echo $ANDROID_NDK
+$CMAKE \
+	-B${@: -1}/build \
+	-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+	-DANDROID_STL:STRING=c++_shared \
+	-DCMAKE_SYSTEM_NAME=Android \
+	-DANDROID_NDK=$ANDROID_NDK \
+	-DANDROID_PLATFORM=android-$ANDROID_API \
+	-DANDROID_TOOLCHAIN_NAME=$TARGET- \
+	-DCMAKE_INSTALL_PREFIX=$PREFIX \
+	-DCMAKE_PREFIX_PATH=$PREFIX \
+	$@
+
+#-DCMAKE_INSTALL_PREFIX=$SYSROOT \
+#	-DCMAKE_PREFIX_PATH="$SYSROOT" \
+#	-DCMAKE_INCLUDE_PATH=$SYSROOT/include/libxml2 \
+#	-DCMAKE_LIBRARY=$SYSROOT/lib \
+
+	#-DANDROID_PLATFORM=android-$ANDROID_API \
+#	-DCMAKE_SYSROOT=$SYSROOT \
