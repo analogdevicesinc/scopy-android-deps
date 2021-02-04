@@ -2,6 +2,8 @@
 set -e
 source ./android_toolchain.sh
 
+BUILD_FOLDER=./build_$ABI
+
 reset_build_env() {
 	rm -rf $WORKDIR
 	mkdir -p $WORKDIR
@@ -27,11 +29,11 @@ build_libxml2() {
 	git clone --depth=1 https://gitlab.gnome.org/GNOME/libxml2
 	cd libxml2
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf build
-	mkdir -p build
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
 	echo $PWD
-	./android_cmake.sh -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_PYTHON=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd build
+	./android_cmake.sh -B$BUILD_FOLDER -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_PYTHON=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
 	popd
@@ -43,11 +45,11 @@ build_libiio() {
 	git clone --depth=1 https://github.com/analogdevicesinc/libiio
 	cd libiio
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf build
-	mkdir -p build
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
 	echo $PWD
-	./android_cmake.sh --debug-find -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd build
+	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
 	popd
@@ -59,11 +61,11 @@ build_libm2k() {
 	git clone --depth=1 https://github.com/analogdevicesinc/libm2k --branch android
 	cd libm2k
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf build
-	mkdir -p build
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
 	echo $PWD
-	./android_cmake.sh -DENABLE_PYTHON=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd build
+	./android_cmake.sh -B$BUILD_FOLDER -DENABLE_PYTHON=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
 	popd

@@ -3,7 +3,7 @@
 #export ANDROID_NDK=$HOME/Android/Sdk/ndk-bundle
 #export ANDROID_API=28
 #CMAKE="echo"
-echo DEV_PREFIX = $DEV_PREFIX
+#echo DEV_PREFIX = $DEV_PREFIX
 
 ################ HACK .. REMOVE ALL LIBRARIES FROM
 # ~/android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android
@@ -15,9 +15,7 @@ echo DEV_PREFIX = $DEV_PREFIX
 # to distributionUrl=https\://services.gradle.org/distributions/gradle-6.3-all.zip
 ###############################################################################################################################################
 
-
 $CMAKE \
-	-B${@: -1}/build \
 	-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
 	-DCMAKE_BUILD_TYPE:String=Debug \
 	-DANDROID_STL:STRING=c++_shared \
@@ -31,8 +29,14 @@ $CMAKE \
 	-DCMAKE_LIBRARY_PATH=$DEV_PREFIX \
 	-DCMAKE_INSTALL_PREFIX=$DEV_PREFIX \
 	-DCMAKE_STAGING_PREFIX=$DEV_PREFIX \
-	-DCMAKE_C_FLAGS=$CFLAGS \
-	-DCMAKE_SHARED_LINKER_FLAGS=$LDFLAGS \
+	-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
+	-DCMAKE_SHARED_LINKER_FLAGS="${LDFLAGS}" \
 	-DCMAKE_PREFIX_PATH=$DEV_PREFIX/lib/cmake \
+	-DANDROID_LD=lld \
 	$QTFLAGS \
 	$@
+
+#	-DCMAKE_C_FLAGS=$CFLAGS \
+#	-DCMAKE_CPP_FLAGS=$CPPFLAGS \
+
+#	-DCMAKE_SHARED_LINKER_FLAGS=$LDFLAGS \
