@@ -8,6 +8,10 @@
 ################ HACK .. REMOVE ALL LIBRARIES FROM
 # ~/android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android
 # so CMAKE TARGETS ~/android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/$API_VERSION
+#
+# libunwind.a still needs to be in the search path - it's not part of the API version
+# only for armeabi-v7a
+#
 ### FIGURE OUT HOW TO CHANGE THIS FROM CMAKE
 
 ########## HACK2 .. Change gradle version in qt from /home/adi/Qt/5.15.2/android/src/3rdparty/gradle/gradle/wrapper/gradle-wrapper.properties
@@ -32,6 +36,7 @@ $CMAKE \
 	-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
 	-DCMAKE_SHARED_LINKER_FLAGS="${LDFLAGS}" \
 	-DCMAKE_PREFIX_PATH=$DEV_PREFIX/lib/cmake \
+	-DANDROID_ARM_NEON=ON\
 	-DANDROID_LD=lld \
 	$QTFLAGS \
 	$@
