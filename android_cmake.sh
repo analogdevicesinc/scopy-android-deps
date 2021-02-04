@@ -10,12 +10,18 @@ echo DEV_PREFIX = $DEV_PREFIX
 # so CMAKE TARGETS ~/android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/$API_VERSION
 ### FIGURE OUT HOW TO CHANGE THIS FROM CMAKE
 
+########## HACK2 .. Change gradle version in qt from /home/adi/Qt/5.15.2/android/src/3rdparty/gradle/gradle/wrapper/gradle-wrapper.properties
+# from distributionUrl=https\://services.gradle.org/distributions/gradle(whatever_version_smaller_than 6.3).zip
+# to distributionUrl=https\://services.gradle.org/distributions/gradle-6.3-all.zip
+###############################################################################################################################################
+
+
 $CMAKE \
 	-B${@: -1}/build \
 	-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
 	-DCMAKE_BUILD_TYPE:String=Debug \
 	-DANDROID_STL:STRING=c++_shared \
-	-DANDROID_SDK:PATH=/home/adi/android/sdk/ \
+	-DANDROID_SDK:PATH=$ANDROID_SDK \
 	-DCMAKE_SYSTEM_NAME=Android \
 	-DANDROID_NDK=$ANDROID_NDK \
 	-DANDROID_PLATFORM=android-$API \
@@ -27,28 +33,6 @@ $CMAKE \
 	-DCMAKE_STAGING_PREFIX=$DEV_PREFIX \
 	-DCMAKE_C_FLAGS=$CFLAGS \
 	-DCMAKE_SHARED_LINKER_FLAGS=$LDFLAGS \
+	-DCMAKE_PREFIX_PATH=$DEV_PREFIX/lib/cmake \
+	$QTFLAGS \
 	$@
-
-	#-DANDROID_TOOLCHAIN_NAME=$TARGET \
-#QT CMAKE
-#-GNinja
-#-DCMAKE_BUILD_TYPE:String=Debug
-#-DQT_QMAKE_EXECUTABLE:STRING=%{Qt:qmakeExecutable}
-#-DCMAKE_PREFIX_PATH:STRING=%{Qt:QT_INSTALL_PREFIX}
-#-DCMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}
-#-DCMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}
-#-DANDROID_NATIVE_API_LEVEL:STRING=16
-#-DANDROID_NDK:PATH=/home/adi/android/sdk/ndk/21.3.6528147
-#-DCMAKE_TOOLCHAIN_FILE:PATH=/home/adi/android/sdk/ndk/21.3.6528147/build/cmake/android.toolchain.cmake
-#-DANDROID_ABI:STRING=armeabi-v7a
-#-DANDROID_STL:STRING=c++_shared
-#-DCMAKE_FIND_ROOT_PATH:PATH=%{Qt:QT_INSTALL_PREFIX}
-#-DANDROID_SDK:PATH=/home/adi/android/sdk/
-
-#-DCMAKE_INSTALL_PREFIX=$SYSROOT \
-#	-DCMAKE_PREFIX_PATH="$SYSROOT" \
-#	-DCMAKE_INCLUDE_PATH=$SYSROOT/include/libxml2 \
-#	-DCMAKE_LIBRARY=$SYSROOT/lib \
-
-	#-DANDROID_PLATFORM=android-$ANDROID_API \
-#	-DCMAKE_SYSROOT=$SYSROOT \

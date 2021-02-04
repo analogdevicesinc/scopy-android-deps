@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #need at least 28 for glob
 export API=28
@@ -25,10 +25,14 @@ export WORKDIR=$SCRIPT_HOME_DIR/deps_build_$TARGET_PREFIX
 export DEPS_SRC_PATH=$SCRIPT_HOME_DIR/deps_src
 export JOBS=9
 
-export ANDROID_NDK=$HOME/android/sdk/ndk/$NDK_VERSION
+export ANDROID_SDK=$HOME/android/sdk
+export ANDROID_NDK=$ANDROID_SDK/ndk/$NDK_VERSION
 export TOOLCHAIN=${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64
 export CMAKE=/home/adi/Qt/Tools/CMake/bin/cmake
 export QT_INSTALL_PREFIX=/home/adi/Qt/5.15.2/android
+export QMAKE=$QT_INSTALL_PREFIX/bin/qmake
+export ANDROID_QT_DEPLOY=$QT_INSTALL_PREFIX/bin/androiddeployqt
+export JDK=/home/adi/jdk-15.0.2
 
 # Apparently android-8 works fine, there are other versions, look them up
 export SYSROOT=$TOOLCHAIN/sysroot
@@ -64,3 +68,4 @@ export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
 export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX}"
 #export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${SYSROOT}/usr/lib -L${TOOLCHAIN}/lib -L${DEV_PREFIX}"
 
+source android_qt_initial_cmake_params.in
