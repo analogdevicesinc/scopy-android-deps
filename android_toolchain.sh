@@ -60,7 +60,7 @@ export PKG_CONFIG_PATH=${DEV_PREFIX}/lib/pkgconfig
 # Note that this was only required to build boehm-gc with dynamic linking support.
 # -target $TARGET_TRIPLE
 export CFLAGS="-fPIE -fPIC --sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX} ${CFLAGS}"
-export CPPFLAGS="${CFLAGS}"
+export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
 export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX}"
 #export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${SYSROOT}/usr/lib -L${TOOLCHAIN}/lib -L${DEV_PREFIX}"
 

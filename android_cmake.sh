@@ -14,7 +14,7 @@ $CMAKE \
 	-B${@: -1}/build \
 	-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
 	-DCMAKE_BUILD_TYPE:String=Debug \
-	-DANDROID_STL:STRING=c++_static \
+	-DANDROID_STL:STRING=c++_shared \
 	-DANDROID_SDK:PATH=/home/adi/android/sdk/ \
 	-DCMAKE_SYSTEM_NAME=Android \
 	-DANDROID_NDK=$ANDROID_NDK \

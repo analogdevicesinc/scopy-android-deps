@@ -2,6 +2,12 @@
 set -e
 source ./android_toolchain.sh
 
+reset_build_env() {
+	rm -rf $WORKDIR
+	mkdir -p $WORKDIR
+	cd $WORKDIR
+}
+
 build_libiconv() {
 
 	pushd $WORKDIR
@@ -47,11 +53,27 @@ build_libiio() {
 	popd
 }
 
+build_libm2k() {
+	pushd $WORKDIR
+	rm -rf libm2k
+	git clone --depth=1 https://github.com/analogdevicesinc/libm2k --branch android
+	cd libm2k
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	rm -rf build
+	mkdir -p build
+	echo $PWD
+	./android_cmake.sh -DENABLE_PYTHON=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd build
+	make -j$JOBS
+	make -j$JOBS install
+	popd
 
-rm -rf $WORKDIR
-mkdir -p $WORKDIR
-cd $WORKDIR
+}
 
+
+
+reset_build_env
 build_libiconv
 build_libxml2
 build_libiio
+build_libm2k
