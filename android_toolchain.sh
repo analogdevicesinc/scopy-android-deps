@@ -1,44 +1,54 @@
 #!/bin/bash
 
-############### SYSTEM SPECIFIC DEFINES ############
-export ANDROID_SDK=$HOME/android/sdk
-export CMAKE=/home/adi/Qt/Tools/CMake/bin/cmake
-export QT_INSTALL_PREFIX=/home/adi/Qt/5.15.2/android
-export JDK=/home/adi/jdk-15.0.2
+source build_system_setup.sh
+
 export NDK_VERSION=21.3.6528147
 export API=28 # need ABI at least 28 for glob from my tests
 export JOBS=9
-export SCRIPT_HOME_DIR=/home/adi/android/scopy-android-deps
 
+if [ $# -ne 1 ]; then
+	ARG1=aarch64
+else
+	ARG1=$1
+fi
+
+TARGET_PREFIX=NO_ABI
+
+if [ $ARG1 = "aarch64" ]; then
 ############ aarch64 #########
-#export ABI=arm64-v8a
-#export TARGET_PREFIX=aarch64-linux-android
-#export TARGET_BINUTILS=aarch64-linux-android
+export ABI=arm64-v8a
+export TARGET_PREFIX=aarch64-linux-android
+export TARGET_BINUTILS=aarch64-linux-android
 #############################
+fi
 
+if [ $ARG1 = "arm" ]; then
 ############# armv7a ##########
-#export ABI=armeabi-v7a
-#export TARGET_PREFIX=armv7a-linux-androideabi
-#export TARGET_BINUTILS=arm-linux-androideabi
+export ABI=armeabi-v7a
+export TARGET_PREFIX=armv7a-linux-androideabi
+export TARGET_BINUTILS=arm-linux-androideabi
 ###############################
+fi
 
+if [ $ARG1 = "x86_64" ]; then
 ############# x86_64 ###########
-#export TARGET_BINUTILS=x86_64-linux-android
-#export ABI=x86_64
-#export TARGET_PREFIX=x86_64-linux-android
+export TARGET_BINUTILS=x86_64-linux-android
+export ABI=x86_64
+export TARGET_PREFIX=x86_64-linux-android
 #################################
+fi
 
+if [ $ARG1 = "x86" ]; then
 ######## x86 - i686 ############
 export TARGET_PREFIX=i686-linux-android
 export ABI=x86
 export TARGET_BINUTILS=i686-linux-android
 #################################
+fi
 
-echo $TARGET_PREFIX
 
 export WORKDIR=$SCRIPT_HOME_DIR/deps_build_$TARGET_PREFIX
 export DEPS_SRC_PATH=$SCRIPT_HOME_DIR/deps_src
-echo SCRIPT_HOME_DIR $SCRIPT_HOME_DIR
 
 # This is just an empty directory where I want the built objects to be installed
 export DEV_PREFIX=$WORKDIR/out
@@ -63,6 +73,7 @@ export CPP="$CC -E"
 export AR=$TOOLCHAIN/bin/llvm-ar
 export AS=${CC}
 export NM=$TOOLCHAIN/bin/nm
+#export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld
 export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld.gold
 #export LD=$TOOLCHAIN/bin/ld.lld
 #$LD
@@ -77,4 +88,12 @@ export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
 export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
 #export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${SYSROOT}/usr/lib -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -l"
 
-source $SCRIPT_HOME_DIR/android_qt_initial_cmake_params.in
+#echo ANDROID_SDK=$ANDROID_SDK
+#echo CMAKE=$CMAKE
+#echo QT_INSTALL_PREFIX=$QT_INSTALL_PREFIX
+#echo JDK=$JDK
+#echo NDK_VERSION=$NDK_VERSION
+#echo JOBS=$JOBS
+#echo SCRIPT_HOME_DIR=$SCRIPT_HOME_DIR
+#echo
+echo $TARGET_PREFIX$API

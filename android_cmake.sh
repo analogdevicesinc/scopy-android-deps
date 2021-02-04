@@ -19,6 +19,7 @@
 # to distributionUrl=https\://services.gradle.org/distributions/gradle-6.3-all.zip
 ###############################################################################################################################################
 
+#CMAKE=echo
 $CMAKE \
 	-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
 	-DCMAKE_BUILD_TYPE:String=Debug \
@@ -28,17 +29,21 @@ $CMAKE \
 	-DANDROID_NDK=$ANDROID_NDK \
 	-DANDROID_PLATFORM=android-$API \
 	-DANDROID_ABI:STRING=$ABI \
-	-DANDROID_TOOLCHAIN_NAME=$TARGET \
+	-DANDROID_TOOLCHAIN=clang \
 	-DCMAKE_FIND_ROOT_PATH:PATH=$QT_INSTALL_PREFIX \
 	-DCMAKE_LIBRARY_PATH=$DEV_PREFIX \
 	-DCMAKE_INSTALL_PREFIX=$DEV_PREFIX \
 	-DCMAKE_STAGING_PREFIX=$DEV_PREFIX \
 	-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
 	-DCMAKE_SHARED_LINKER_FLAGS="${LDFLAGS}" \
-	-DCMAKE_PREFIX_PATH=$DEV_PREFIX/lib/cmake \
-	-DANDROID_ARM_NEON=ON\
+	-DANDROID_ARM_NEON=ON \
 	-DANDROID_LD=lld \
-	$QTFLAGS \
+	-DQT_QMAKE_EXECUTABLE:STRING=$QMAKE \
+	-DCMAKE_PREFIX_PATH:STRING=$QT_INSTALL_PREFIX\;$DEV_PREFIX/lib/cmake \
+	-DCMAKE_C_COMPILER:STRING=$CC \
+	-DCMAKE_CXX_COMPILER:STRING=$CXX \
+	-DANDROID_NATIVE_API_LEVEL:STRING=$API \
+	-Bbuild_$ABI \
 	$@
 
 #	-DCMAKE_C_FLAGS=$CFLAGS \
