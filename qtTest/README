@@ -1,0 +1,8 @@
+To open the project in Qt you need to manually add to initial cmake arguments
+
+CMAKE_STAGING_PATH - points to the deps_build_<arch>/out
+CMAKE_PREFIX_PATH - points to  deps_build_<arch>/out/lib/cmake
+
+This can be super-buggy sometimes - but it will eventually allow you to debug the application
+
+Another approach is to build using android_cmake , make, androiddeployqt, and then from qt open the project and manually set the build folder

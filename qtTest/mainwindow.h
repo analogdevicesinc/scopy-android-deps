@@ -20,6 +20,8 @@ private slots:
 
 	void on_pushButton_libm2k_clicked();
 
+	void on_pushButton_clicked();
+
 private:
 	Ui::MainWindow *ui;
 };

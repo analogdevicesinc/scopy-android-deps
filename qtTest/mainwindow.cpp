@@ -16,6 +16,8 @@ using namespace libm2k::analog;
 using namespace libm2k::context;
 
 #define URI "ip:192.168.2.1"
+QString Uri = URI;
+
 
 #define PS_CHANNEL (0)
 #define PS_VOLTAGE (1.7)
@@ -33,11 +35,13 @@ MainWindow::MainWindow(QWidget *parent)
 	QString library_version("libiio version: " + QString::number(maj)+"."+QString::number(min)+"\n");
 	library_version+=("libm2k version: "+ QString::fromStdString(getVersion()));
 	library_version+="\n";
-	library_version+="Default URI:"+QString(URI);
+
 
 	ui->label->setText(library_version);
 	ui->textEdit->setText("Click button to connect ...");
 	ui->textEdit->setReadOnly(true);
+	ui->lineEdit_uri->setText(Uri);
+	ui->label_uri->setText("Connecting to: " +QString(Uri));
 }
 
 MainWindow::~MainWindow()
@@ -54,7 +58,12 @@ void MainWindow::on_pushButton_libiio_clicked()
 
 	std::map<std::string,std::string> m_context_attributes;
 	char tag[20];
-	ctx=iio_create_context_from_uri(URI);
+	ctx=iio_create_context_from_uri(Uri.toStdString().c_str());
+	if(!ctx)
+	{
+		ui->textEdit->setText("No IIO device found at uri: " + Uri);
+		return;
+	}
 	iio_context_get_version(ctx, &major, &minor, tag);
 	unsigned int attr_no = iio_context_get_attrs_count(ctx);
 
@@ -79,18 +88,18 @@ void MainWindow::on_pushButton_libiio_clicked()
 
 void MainWindow::on_pushButton_libm2k_clicked()
 {
-		M2k *ctx = m2kOpen(URI);
+		M2k *ctx = m2kOpen(Uri.toStdString().c_str());
 		ui->textEdit->setText("");
-		ui->textEdit->insertPlainText("Connected  " + QString(URI) + "\n");
-		ui->textEdit->insertPlainText(QString::fromStdString(ctx->getContextDescription())+"\n");
 		if (!ctx) {
 			ui->textEdit->setText("Connection Error: No ADALM2000 device available/connected to your PC.");
 			return;
 		}
+		ui->textEdit->insertPlainText("Connected  " + QString(Uri) + "\n");
+		ui->textEdit->insertPlainText(QString::fromStdString(ctx->getContextDescription())+"\n");
 		ui->textEdit->insertPlainText("Calibrating... \n");
 
 		QCoreApplication::processEvents();
-		ctx->calibrateADC();
+		//ctx->calibrateADC(); // this needs to be in a separate thread as the hanging thread crashes on native android
 
 
 		// Will turn on the power supply if we need smth to measure
@@ -108,4 +117,10 @@ void MainWindow::on_pushButton_libm2k_clicked()
 		ui->textEdit->insertPlainText("Analog in voltage: " + QString::number(voltage)  + "\n");
 
 		contextClose(ctx);
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    Uri = ui->lineEdit_uri->text();
+    ui->label_uri->setText("Connecting to: " +QString(Uri));
 }
