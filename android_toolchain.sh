@@ -21,7 +21,7 @@ export TARGET_PREFIX=x86_64-linux-android
 #################################
 
 export SCRIPT_HOME_DIR=$PWD
-export WORKDIR=$SCRIPT_HOME_DIR/dep_build_$TARGET_PREFIX
+export WORKDIR=$SCRIPT_HOME_DIR/deps_build_$TARGET_PREFIX
 export DEPS_SRC_PATH=$SCRIPT_HOME_DIR/deps_src
 export JOBS=9
 
