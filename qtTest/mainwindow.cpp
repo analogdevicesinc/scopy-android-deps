@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "iio.h"
+#include "config.h"
 
 #include <QDebug>
 
@@ -34,7 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
 	iio_library_get_version(&maj,&min,tag);
 	QString library_version("libiio version: " + QString::number(maj)+"."+QString::number(min)+"\n");
 	library_version+=("libm2k version: "+ QString::fromStdString(getVersion()));
-	library_version+="\n";
+
+	library_version+="\ncompiled @ " + QString(__TIME__) + " for " + QString(TARGET_SYS_NAME) + " " + QString(TARGET_PROCESSOR) + "\n";
 
 
 	ui->label->setText(library_version);

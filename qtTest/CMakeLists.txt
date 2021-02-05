@@ -66,6 +66,8 @@ else()
     endif()
 endif()
 
+configure_file(config.h.cmakein config.h @ONLY)
+
 target_link_libraries(qtTest PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${IIO_LIBRARIES} libm2k::libm2k)
 
 message(STATUS " !!! YOU MUST Copy all ${CMAKE_STAGING_PREFIX}/lib/*.so to build/android-build/libs/<your arch>/ to deploy correctly !!! ")
