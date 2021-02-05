@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "iio.h"
 #include "config.h"
+#include <gnuradio/constants.h>
 
 #include <QDebug>
 
@@ -34,7 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
 	char tag[20];
 	iio_library_get_version(&maj,&min,tag);
 	QString library_version("libiio version: " + QString::number(maj)+"."+QString::number(min)+"\n");
-	library_version+=("libm2k version: "+ QString::fromStdString(getVersion()));
+	library_version+=("libm2k version: "+ QString::fromStdString(getVersion())+"\n");
+	library_version+=("gnuradio version "+ QString::fromStdString(gr::version()));
 
 	library_version+="\ncompiled @ " + QString(__TIME__) + " for " + QString(TARGET_SYS_NAME) + " " + QString(TARGET_PROCESSOR) + "\n";
 
@@ -44,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->textEdit->setReadOnly(true);
 	ui->lineEdit_uri->setText(Uri);
 	ui->label_uri->setText("Connecting to: " +QString(Uri));
+
 }
 
 MainWindow::~MainWindow()

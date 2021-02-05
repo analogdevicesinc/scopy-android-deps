@@ -4,6 +4,17 @@ source ./android_toolchain.sh $1
 
 BUILD_FOLDER=./build_$ABI
 
+build_with_cmake() {
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
+	echo $PWD
+	./android_cmake.sh $@ -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd $BUILD_FOLDER
+	make -j$JOBS
+	make -j$JOBS install
+}
+
 reset_build_env() {
 	rm -rf $WORKDIR
 	mkdir -p $WORKDIR
@@ -55,6 +66,15 @@ build_libiio() {
 	popd
 }
 
+build_libad9361 () {
+	pushd $WORKDIR
+	rm -rf libad9361-iio
+	git clone --depth=1 https://github.com/analogdevicesinc/libad9361-iio
+	cd libad9361-iio
+	build_with_cmake
+	popd
+}
+
 build_libm2k() {
 	pushd $WORKDIR
 	rm -rf libm2k
@@ -72,13 +92,22 @@ build_libm2k() {
 
 }
 
+build_boost() {
+	pushd $WORKDIR
+	rm -rf boost_1_72_0
+	tar xvf $DEPS_SRC_PATH/boost_1_72_0.tar.gz
+# https://github.com/moritz-wundke/Boost-for-Android/actions/runs/381763643
+# https://github.com/moritz-wundke/Boost-for-Android
+# https://github.com/bastibl/gnuradio-android
+
+}
 
 
 reset_build_env
 build_libiconv
 build_libxml2
 build_libiio
-#build_libad9361
+build_libad9361
 build_libm2k
 #build_gnuradio
 #build_gr_oot - iio/m2k/scopy

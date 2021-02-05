@@ -41,6 +41,19 @@ find_path(IIO_INCLUDE_DIR iio.h)
 #message(123 ${CMAKE_PREFIX_PATH})
 find_package(libm2k REQUIRED)
 
+
+IF(NOT DEFINED BOOST_ROOT)
+    SET(BOOST_ROOT "${CMAKE_INSTALL_PREFIX}")
+ENDIF()
+
+set(CMAKE_FIND_DEBUG_MODE ON)
+
+set(Boost_COMPILER "")
+set(Boost_ARCHITECTURE "")
+
+find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
+find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt )
+
 include_directories(${IIO_INCLUDE_DIR})
 
 set(PROJECT_SOURCES
@@ -68,6 +81,13 @@ endif()
 
 configure_file(config.h.cmakein config.h @ONLY)
 
-target_link_libraries(qtTest PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${IIO_LIBRARIES} libm2k::libm2k)
+target_link_libraries(qtTest PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${IIO_LIBRARIES}
+			libm2k::libm2k
+			gnuradio::gnuradio-runtime
+					gnuradio::gnuradio-analog
+					gnuradio::gnuradio-blocks
+					gnuradio::gnuradio-fft
+					gnuradio::gnuradio-filter
+			)
 
 message(STATUS " !!! YOU MUST Copy all ${CMAKE_STAGING_PREFIX}/lib/*.so to build/android-build/libs/<your arch>/ to deploy correctly !!! ")

@@ -1,10 +1,11 @@
 #!/bin/bash
 
-source build_system_setup.sh
+source ./build_system_setup.sh
 
 export NDK_VERSION=21.3.6528147
 export API=28 # need ABI at least 28 for glob from my tests
 export JOBS=9
+export HOST_ARCH=linux-x86_64
 
 if [ $# -ne 1 ]; then
 	ARG1=aarch64
@@ -46,9 +47,7 @@ export TARGET_BINUTILS=i686-linux-android
 #################################
 fi
 
-
 export WORKDIR=$SCRIPT_HOME_DIR/deps_build_$TARGET_PREFIX
-export DEPS_SRC_PATH=$SCRIPT_HOME_DIR/deps_src
 
 # This is just an empty directory where I want the built objects to be installed
 export DEV_PREFIX=$WORKDIR/out
@@ -57,6 +56,7 @@ export PKG_CONFIG_PATH=${DEV_PREFIX}/lib/pkgconfig
 
 export ANDROID_NDK=$ANDROID_SDK/ndk/$NDK_VERSION
 export TOOLCHAIN=${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64
+export TOOLCHAIN_BIN=${ANDROID_NDK}/toolchains/llvm/prebuilt/${HOST_ARCH}/bin
 export QMAKE=$QT_INSTALL_PREFIX/bin/qmake
 export ANDROID_QT_DEPLOY=$QT_INSTALL_PREFIX/bin/androiddeployqt
 
@@ -66,26 +66,23 @@ export SYSROOT=$TOOLCHAIN/sysroot
 # Non-exhaustive lists of compiler + binutils
 # Depending on what you compile, you might need more binutils than that
 #export CC=$TOOLCHAIN/bin/clang
+
 export CC=$TOOLCHAIN/bin/$TARGET_PREFIX$API-clang
-#export CXX=$TOOLCHAIN/bin/clang++
 export CXX=$TOOLCHAIN/bin/$TARGET_PREFIX$API-clang++
 export CPP="$CC -E"
 export AR=$TOOLCHAIN/bin/llvm-ar
 export AS=${CC}
-export NM=$TOOLCHAIN/bin/nm
-#export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld
-export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld.gold
-#export LD=$TOOLCHAIN/bin/ld.lld
-#$LD
+export NM=$TOOLCHAIN/bin/${TARGET_BINUTILS}-nm
+export STRIP=${TOOLCHAIN_BIN}/arm-linux-androideabi-strip
+export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld
+#export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld.gold
 export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
 
-# You can clone the full Android sources to get bionic if you want.. I didn't
-# want to so I just got linker.h from here: http://gitorious.org/0xdroid/bionic
-# Note that this was only required to build boehm-gc with dynamic linking support.
-# -target $TARGET_TRIPLE
-export CFLAGS="-fPIE -fPIC --sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX} ${CFLAGS}"
+#export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX} -fPIC"
+export CFLAGS="--sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX} -fPIC"
 export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
-export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
+#export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
+export LDFLAGS="-L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
 #export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${SYSROOT}/usr/lib -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -l"
 
 #echo ANDROID_SDK=$ANDROID_SDK
@@ -97,3 +94,7 @@ export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}
 #echo SCRIPT_HOME_DIR=$SCRIPT_HOME_DIR
 #echo
 echo $TARGET_PREFIX$API
+#if [ $TARGET_PREFIX = "NO_ABI" ]; then
+#	exit 22 # Invalid argument
+#fi
+

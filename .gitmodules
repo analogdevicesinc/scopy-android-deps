@@ -1,0 +1,3 @@
+[submodule "gnuradio-android"]
+	path = gnuradio-android
+	url = https://github.com/adisuciu/gnuradio-android
