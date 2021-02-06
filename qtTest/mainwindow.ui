@@ -64,6 +64,9 @@
          <widget class="QTextEdit" name="textEdit"/>
         </item>
         <item>
+         <layout class="QVBoxLayout" name="plotLayout"/>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton_libiio">
           <property name="text">
            <string>CONNECT libiio</string>

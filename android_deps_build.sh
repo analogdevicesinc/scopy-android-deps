@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -xe
 source ./android_toolchain.sh $1
 
 BUILD_FOLDER=./build_$ABI
@@ -28,7 +28,7 @@ build_libiconv() {
 	tar xvf $DEPS_SRC_PATH/libiconv-1.15.tar.gz
 	cd libiconv-1.15
 	cp $SCRIPT_HOME_DIR/android_configure.sh .
-	./android_configure.sh --enable-static=yes --enable-shared=yes
+	./android_configure.sh --enable-static=no --enable-shared=yes
 	make -j$JOBS
 	make -j$JOBS install
 	popd
@@ -92,25 +92,245 @@ build_libm2k() {
 
 }
 
-build_boost() {
+build_gr-iio() {
+
 	pushd $WORKDIR
-	rm -rf boost_1_72_0
-	tar xvf $DEPS_SRC_PATH/boost_1_72_0.tar.gz
-# https://github.com/moritz-wundke/Boost-for-Android/actions/runs/381763643
-# https://github.com/moritz-wundke/Boost-for-Android
-# https://github.com/bastibl/gnuradio-android
+	rm -rf gr-iio
+	git clone --depth=1 https://github.com/analogdevicesinc/gr-iio --branch upgrade-3.8
+	cd gr-iio
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
+	echo $PWD
+	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd $BUILD_FOLDER
+	make -j$JOBS
+	make -j$JOBS install
+	popd
 
 }
 
+build_gr-m2k() {
+
+	pushd $WORKDIR
+	rm -rf gr-iio
+	git clone --depth=1 https://github.com/analogdevicesinc/gr-m2k --branch master
+	cd gr-m2k
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
+	echo $PWD
+	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd $BUILD_FOLDER
+	make -j$JOBS
+	make -j$JOBS install
+	popd
+
+}
+
+build_gr-scopy() {
+	pushd $WORKDIR
+	rm -rf gr-scopy
+	git clone --depth=1 https://github.com/analogdevicesinc/gr-scopy --branch master
+	cd gr-scopy
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
+	echo $PWD
+	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
+	cd $BUILD_FOLDER
+	make -j$JOBS
+	make -j$JOBS install
+	popd
+
+}
+
+build_qwt() {
+	pushd $WORKDIR
+	QWT_NAME=qwt-code
+	svn checkout svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1-multiaxes $QWT_NAME
+	cd $QWT_NAME
+
+	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtMathML$/#/g" qwtconfig.pri
+	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtDesigner$/#/g" qwtconfig.pri
+	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtExamples$/#/g" qwtconfig.pri
+	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtPlayground$/#/g" qwtconfig.pri
+	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtTests$/#/g" qwtconfig.pri
+
+	# Fix prefix
+	sed -i "s/^\\s*QWT_INSTALL_PREFIX.*$/QWT_INSTALL_PREFIX=\"\"/g" qwtconfig.pri
+
+	$QMAKE ANDROID_ABIS="$ABI" ANDROID_MIN_SDK_VERSION=$API ANDROID_API_VERSION=$API INCLUDEPATH=$DEV_PREFIX/include LIBS=-L$DEV_PREFIX/lib qwt.pro
+	make -j$JOBS INSTALL_ROOT=$DEV_PREFIX install
+
+	popd
+	# qwtpolar is now part of qwt
+
+}
+
+move_qwt_libs (){
+	cp -R $DEV_PREFIX/libs/$ABI/* $DEV_PREFIX/lib # another hack
+}
+
+move_boost_libs() {
+	cp -R $DEV_PREFIX/$ABI/* $DEV_PREFIX
+}
+
+source gnuradio-android/build.sh
+
+build_libffi() {
+	pushd $WORKDIR
+	rm -rf libffi-3.3
+	wget https://github.com/libffi/libffi/releases/download/v3.3/libffi-3.3.tar.gz
+	tar xvf libffi-3.3.tar.gz
+	cd libffi-3.3
+	cp $SCRIPT_HOME_DIR/android_configure.sh .
+	./android_configure.sh --cache-file=android.cache
+	make -j$JOBS
+	make -j$JOBS install
+	popd
+}
+build_gettext() {
+	pushd $WORKDIR
+	rm -rf gettext-0.21
+	wget https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
+	tar xvf gettext-0.21.tar.gz
+	cd gettext-0.21
+	#./gitsub.sh pull
+	#NOCONFIGURE=1 ./autogen.sh
+	cp $SCRIPT_HOME_DIR/android_configure.sh .
+	./android_configure.sh --cache-file=android.cache
+	make -j$JOBS
+	make -j$JOBS install
+	popd
+}
+
+build_glib() {
+	pushd $WORKDIR
+	rm -rf glib-2.58.3
+	#git clone https://git.gnome.org/browse/glib
+	wget https://download.gnome.org/sources/glib/2.58/glib-2.58.3.tar.xz
+	tar xvf glib-2.58.3.tar.xz
+
+
+#CPPFLAGS=/path/to/standalone/include LDFLAGS=/path/to/standalone/lib ./configure \
+#--prefix=/path/to/standalone --bindir=$AS_BIN --build=i686-pc-linux-gnu --host=arm-linux-androideabi \
+#--cache-file=android.cache
+	cd glib-2.58.3
+
+echo "glib_cv_stack_grows=no
+glib_cv_uscore=no
+ac_cv_func_posix_getpwuid_r=no
+ac_cv_func_posix_getgrgid_r=no " > android.cache
+
+	NOCONFIGURE=1 ./autogen.sh
+	cp $SCRIPT_HOME_DIR/android_configure.sh .
+	./android_configure.sh --cache-file=android.cache --with-libiconv=gnu --disable-dtrace --disable-xattr --disable-systemtap --with-pcre=internal --enable-libmount=no
+	make -j$JOBS LDFLAGS="$LDFLAGS -lffi -lz"
+	make -j$JOBS install
+	popd
+}
+
+build_glibmm() {
+	echo "### Building glibmm - 2.58.1"
+	pushd $WORKDIR
+	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.58/glibmm-2.58.1.tar.xz
+	tar xvf glibmm-2.58.1.tar.xz
+	cd glibmm-2.58.1
+	cp $SCRIPT_HOME_DIR/android_configure.sh .
+	./android_configure.sh
+	make -j$JOBS LDFLAGS="$LDFLAGS -lffi -lz"
+	make -j$JOBS install
+	popd
+}
+
+build_sigcpp() {
+	echo "### Building libsigc++ -2.10.0"
+	pushd $WORKDIR
+	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
+	tar xvf libsigc++-2.10.0.tar.xz
+	cd libsigc++-2.10.0
+	cp $SCRIPT_HOME_DIR/android_configure.sh .
+	./android_configure.sh
+	make -j$JOBS
+	make -j$JOBS install
+	popd
+}
+
+build_libsigrokdecode() {
+
+	pushd $WORKDIR
+	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git
+	cd ${WORKDIR}/libsigrokdecode
+	cp $SCRIPT_HOME_DIR/android_configure.sh .
+
+	NOCONFIGURE=1 ./autogen.sh
+	./android_configure.sh
+	make -j$JOBS
+	make -j$JOBS install
+	popd
+
+}
+build_python() {
+	pushd $WORKDIR
+	rm -rf Python-3.8.7
+	wget https://www.python.org/ftp/python/3.8.7/Python-3.8.7.tgz
+	tar xvf Python-3.8.7.tgz
+	cd Python-3.8.7
+	echo "ac_cv_file__dev_ptmx=no
+ac_cv_file__dev_ptc=no " > config.site
+	cp $SCRIPT_HOME_DIR/android_configure.sh .
+	CONFIG_SITE=config.site ./android_configure.sh --disable-ipv6
+	make -j$JOBS LDFLAGS="$LDFLAGS -lintl -liconv"
+	make -j$JOBS install
+	popd
+
+}
+
+build_scopy() {
+
+	pushd $WORKDIR
+	rm -rf scopy
+	git clone https://github.com/adisuciu/scopy.git --branch android
+	cd ${WORKDIR}/scopy
+	rm -rf build*
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
+
+	./android_cmake.sh .
+	cd build_$ABI
+	make -j$JOBS
+	make -j$JOBS install
+	cd ..
+	./android_deploy_qt.sh
+	popd
+}
 
 reset_build_env
 build_libiconv
+build_libffi
+build_gettext
+build_libiconv # HANDLE CIRCULAR DEP
+build_glib
+build_sigcpp
+build_glibmm
 build_libxml2
+build_boost
+move_boost_libs
+build_libzmq
+build_fftw
+build_libgmp
+#build_libusb # THIS IS BUGGED I THINK
 build_libiio
 build_libad9361
 build_libm2k
-#build_gnuradio
-#build_gr_oot - iio/m2k/scopy
-#build_qwt
-#build_qwt_polar
-#build_libsigrokdecode
+build_volk
+build_gnuradio
+build_gr-iio
+build_gr-scopy
+build_gr-m2k
+build_qwt
+move_qwt_libs
+build_python
+build_libsigrokdecode
+build_scopy

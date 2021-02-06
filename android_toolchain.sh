@@ -4,6 +4,7 @@ source ./build_system_setup.sh
 
 export NDK_VERSION=21.3.6528147
 export API=28 # need ABI at least 28 for glob from my tests
+#export JOBS=$(getconf _NPROCESSORS_ONLN)
 export JOBS=9
 export HOST_ARCH=linux-x86_64
 
@@ -54,9 +55,9 @@ export DEV_PREFIX=$WORKDIR/out
 # Don't mix up .pc files from your host and build target
 export PKG_CONFIG_PATH=${DEV_PREFIX}/lib/pkgconfig
 
-export ANDROID_NDK=$ANDROID_SDK/ndk/$NDK_VERSION
-export TOOLCHAIN=${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64
-export TOOLCHAIN_BIN=${ANDROID_NDK}/toolchains/llvm/prebuilt/${HOST_ARCH}/bin
+export ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION
+export TOOLCHAIN=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/$HOST_ARCH
+export TOOLCHAIN_BIN=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${HOST_ARCH}/bin
 export QMAKE=$QT_INSTALL_PREFIX/bin/qmake
 export ANDROID_QT_DEPLOY=$QT_INSTALL_PREFIX/bin/androiddeployqt
 
@@ -74,24 +75,23 @@ export AR=$TOOLCHAIN/bin/llvm-ar
 export AS=${CC}
 export NM=$TOOLCHAIN/bin/${TARGET_BINUTILS}-nm
 export STRIP=${TOOLCHAIN_BIN}/arm-linux-androideabi-strip
+export READELF=$TOOLCHAIN/bin/${TARGET_BINUTILS}-readelf
 export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld
-#export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld.gold
 export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
 
-#export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX} -fPIC"
-export CFLAGS="--sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX} -fPIC"
+export CFLAGS="-I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"
+export STAGING_DIR=${DEV_PREFIX}
+#export CFLAGS="--sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"
 export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
-#export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
-export LDFLAGS="-L${SYSROOT}/usr/lib/$TARGET/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
-#export LDFLAGS="${LDFLAGS} -pie -L${SYSROOT}/usr/lib/$TARGET/$API -L${SYSROOT}/usr/lib -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -l"
+export LDFLAGS="-L${SYSROOT}/usr/lib/$TARGET_BINUTILS/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
 
-#echo ANDROID_SDK=$ANDROID_SDK
-#echo CMAKE=$CMAKE
-#echo QT_INSTALL_PREFIX=$QT_INSTALL_PREFIX
-#echo JDK=$JDK
-#echo NDK_VERSION=$NDK_VERSION
-#echo JOBS=$JOBS
-#echo SCRIPT_HOME_DIR=$SCRIPT_HOME_DIR
+echo ANDROID_SDK=$ANDROID_SDK_ROOT
+echo CMAKE=$CMAKE
+echo QT_INSTALL_PREFIX=$QT_INSTALL_PREFIX
+echo JDK=$JDK
+echo NDK_VERSION=$NDK_VERSION
+echo JOBS=$JOBS
+echo SCRIPT_HOME_DIR=$SCRIPT_HOME_DIR
 #echo
 echo $TARGET_PREFIX$API
 #if [ $TARGET_PREFIX = "NO_ABI" ]; then

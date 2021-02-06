@@ -1,4 +1,5 @@
 #!/bin/bash
+set -xe
 
 if [ $# -ne 1 ]; then
         ARG1=build_$ABI
