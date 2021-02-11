@@ -53,9 +53,9 @@ build_libxml2() {
 build_libiio() {
 	pushd $WORKDIR
 	rm -rf libiio
-	git clone --depth=1 https://github.com/analogdevicesinc/libiio
+	git clone https://github.com/analogdevicesinc/libiio
 	cd libiio
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	cp $SCRIPT_HOME_DIR/android_cmake.sh -DHAVE_DNS_SD=OFF
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
 	echo $PWD
@@ -78,7 +78,7 @@ build_libad9361 () {
 build_libm2k() {
 	pushd $WORKDIR
 	rm -rf libm2k
-	git clone --depth=1 https://github.com/analogdevicesinc/libm2k --branch android
+	git clone --depth=1 https://github.com/analogdevicesinc/libm2k --branch master
 	cd libm2k
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	rm -rf $BUILD_FOLDER
@@ -113,7 +113,7 @@ build_gr-iio() {
 build_gr-m2k() {
 
 	pushd $WORKDIR
-	rm -rf gr-iio
+	rm -rf gr-m2k
 	git clone --depth=1 https://github.com/analogdevicesinc/gr-m2k --branch master
 	cd gr-m2k
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
@@ -287,6 +287,24 @@ ac_cv_file__dev_ptc=no " > config.site
 
 }
 
+
+build_libtinyiiod() {
+
+	pushd $WORKDIR
+	rm -rf scopy
+	git clone https://github.com/analogdevicesinc/libtinyiiod.git --branch master
+	cd ${WORKDIR}/libtinyiiod
+	rm -rf build*
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
+
+	./android_cmake.sh .
+	cd build_$ABI
+	make -j$JOBS
+	make -j$JOBS install
+	cd ..
+	popd
+}
 build_scopy() {
 
 	pushd $WORKDIR
@@ -306,31 +324,32 @@ build_scopy() {
 	popd
 }
 
-reset_build_env
-build_libiconv
-build_libffi
-build_gettext
-build_libiconv # HANDLE CIRCULAR DEP
-build_glib
-build_sigcpp
-build_glibmm
-build_libxml2
-build_boost
-move_boost_libs
-build_libzmq
-build_fftw
-build_libgmp
-#build_libusb # THIS IS BUGGED I THINK
+#reset_build_env
+#build_libiconv
+#build_libffi
+#build_gettext
+#build_libiconv # HANDLE CIRCULAR DEP
+#build_glib
+#build_sigcpp
+#build_glibmm
+#build_libxml2
+#build_boost
+#move_boost_libs
+#build_libzmq
+#build_fftw
+#build_libgmp
+build_libusb # THIS IS BUGGED I THINK
 build_libiio
 build_libad9361
 build_libm2k
-build_volk
-build_gnuradio
+#build_volk
+#build_gnuradio
 build_gr-iio
-build_gr-scopy
+#build_gr-scopy
 build_gr-m2k
-build_qwt
-move_qwt_libs
-build_python
-build_libsigrokdecode
-build_scopy
+#build_qwt
+#move_qwt_libs
+#build_python
+#build_libsigrokdecode
+#build_libtinyiiod
+#build_scopy
