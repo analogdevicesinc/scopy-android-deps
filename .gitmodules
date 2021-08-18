@@ -1,3 +1,34 @@
 [submodule "gnuradio-android"]
 	path = gnuradio-android
-	url = https://github.com/adisuciu/gnuradio-android
+	url = https://github.com/ioanachelaru/gnuradio-android
+[submodule "libxml2"]
+	path = libxml2
+	url = https://github.com/GNOME/libxml2
+[submodule "libiio"]
+	path = libiio
+	url = https://github.com/analogdevicesinc/libiio
+[submodule "libad9361-iio"]
+	path = libad9361-iio
+	url = https://github.com/analogdevicesinc/libad9361-iio
+[submodule "libm2k"]
+	path = libm2k
+	url = https://github.com/analogdevicesinc/libm2k
+[submodule "gr-iio"]
+	path = gr-iio
+	url = https://github.com/analogdevicesinc/gr-iio
+[submodule "gr-m2k"]
+	path = gr-m2k
+	url = https://github.com/analogdevicesinc/gr-m2k
+[submodule "gr-scopy"]
+	path = gr-scopy
+	url = https://github.com/analogdevicesinc/gr-scopy
+[submodule "libsigrokdecode"]
+	path = libsigrokdecode
+	url = https://github.com/sigrokproject/libsigrokdecode.git
+[submodule "libtinyiiod"]
+	path = libtinyiiod
+	url = https://github.com/analogdevicesinc/libtinyiiod.git
+[submodule "scopy"]
+	path = scopy
+	url = https://github.com/adisuciu/scopy.git
+	branch = android2
