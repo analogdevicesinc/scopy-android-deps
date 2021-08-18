@@ -16,11 +16,9 @@ build_with_cmake() {
 }
 
 reset_build_env() {
-	rm -rf $DEPS_SRC_PATH
 	rm -rf $WORKDIR
 	mkdir -p $WORKDIR
 	cd $WORKDIR
-	source $SCRIPT_HOME_DIR/download_deps_src.sh
 }
 
 build_libiconv() {
@@ -186,8 +184,7 @@ source gnuradio-android/build.sh
 build_libffi() {
 	pushd $WORKDIR
 	rm -rf libffi-3.3
-	wget https://github.com/libffi/libffi/releases/download/v3.3/libffi-3.3.tar.gz
-	tar xvf libffi-3.3.tar.gz
+	tar xvf $DEPS_SRC_PATH/libffi-3.3.tar.gz
 	cd libffi-3.3
 	cp $SCRIPT_HOME_DIR/android_configure.sh .
 	./android_configure.sh --cache-file=android.cache
@@ -198,8 +195,7 @@ build_libffi() {
 build_gettext() {
 	pushd $WORKDIR
 	rm -rf gettext-0.21
-	wget https://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.gz
-	tar xvf gettext-0.21.tar.gz
+	tar xvf $DEPS_SRC_PATH/gettext-0.21.tar.gz
 	cd gettext-0.21
 	#./gitsub.sh pull
 	#NOCONFIGURE=1 ./autogen.sh
@@ -214,8 +210,7 @@ build_glib() {
 	pushd $WORKDIR
 	rm -rf glib-2.58.3
 	#git clone https://git.gnome.org/browse/glib
-	wget https://download.gnome.org/sources/glib/2.58/glib-2.58.3.tar.xz
-	tar xvf glib-2.58.3.tar.xz
+	tar xvf $DEPS_SRC_PATH/glib-2.58.3.tar.xz
 
 
 #CPPFLAGS=/path/to/standalone/include LDFLAGS=/path/to/standalone/lib ./configure \
@@ -239,8 +234,7 @@ ac_cv_func_posix_getgrgid_r=no " > android.cache
 build_glibmm() {
 	echo "### Building glibmm - 2.58.1"
 	pushd $WORKDIR
-	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.58/glibmm-2.58.1.tar.xz
-	tar xvf glibmm-2.58.1.tar.xz
+	tar xvf $DEPS_SRC_PATH/glibmm-2.58.1.tar.xz
 	cd glibmm-2.58.1
 	cp $SCRIPT_HOME_DIR/android_configure.sh .
 	./android_configure.sh
@@ -252,8 +246,7 @@ build_glibmm() {
 build_sigcpp() {
 	echo "### Building libsigc++ -2.10.0"
 	pushd $WORKDIR
-	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
-	tar xvf libsigc++-2.10.0.tar.xz
+	tar xvf $DEPS_SRC_PATH/libsigc++-2.10.0.tar.xz
 	cd libsigc++-2.10.0
 	#  https://download.gnome.org/sources/glib/2.58/glib-2.58.3.tar.xz
 	cp $SCRIPT_HOME_DIR/android_configure.sh .
@@ -280,8 +273,7 @@ build_libsigrokdecode() {
 build_python() {
 	pushd $WORKDIR
 	rm -rf Python-3.8.7
-	wget https://www.python.org/ftp/python/3.8.7/Python-3.8.7.tgz
-	tar xvf Python-3.8.7.tgz
+	tar xvf $DEPS_SRC_PATH/Python-3.8.7.tgz
 	cd Python-3.8.7
 	echo "ac_cv_file__dev_ptmx=no
 ac_cv_file__dev_ptc=no " > config.site
