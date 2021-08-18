@@ -1,0 +1,20 @@
+Index: src.pro
+===================================================================
+--- src.pro	(revision 3381)
++++ src.pro	(working copy)
+@@ -26,6 +26,7 @@
+     CONFIG += dll
+     win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
+ 
++    !android: {
+     !isEmpty( QMAKE_LFLAGS_SONAME ) {
+     
+         # we increase the SONAME for every minor number
+@@ -33,6 +34,7 @@
+         QWT_SONAME=libqwt.so.$${VER_MAJ}.$${VER_MIN}
+         QMAKE_LFLAGS *= $${QMAKE_LFLAGS_SONAME}$${QWT_SONAME}
+         QMAKE_LFLAGS_SONAME=
++	}
+     }
+ }
+ else {
