@@ -69,9 +69,9 @@ link_directories(
 	${Boost_LIBRARY_DIRS}
 	${GNURADIO_RUNTIME_LIBRARY_DIRS}
 	)
-#set(CMAKE_FIND_DEBUG_MODE TRUE)
-find_package(gnuradio-iio REQUIRED PATH_SUFFIXES lib/cmake/iio)
-#set(CMAKE_FIND_DEBUG_MODE FALSE)
+set(CMAKE_FIND_DEBUG_MODE TRUE)
+find_package(gnuradio-iio REQUIRED PATH_SUFFIXES iio)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 
 find_library(QWT_LIBRARIES REQUIRED NAMES qwt qwt_${ANDROID_ABI})
 
