@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./build_system_setup.sh
+source ./build_system_setup.sh $2
 
 export NDK_VERSION=21.3.6528147
 export API=28 # need ABI at least 28 for glob from my tests

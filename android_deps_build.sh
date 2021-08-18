@@ -1,6 +1,6 @@
 #!/bin/bash
 set -xe
-source ./android_toolchain.sh $1
+source ./android_toolchain.sh $1 $2
 
 BUILD_FOLDER=./build_$ABI
 
@@ -16,9 +16,11 @@ build_with_cmake() {
 }
 
 reset_build_env() {
+	rm -rf $DEPS_SRC_PATH
 	rm -rf $WORKDIR
 	mkdir -p $WORKDIR
 	cd $WORKDIR
+	source $SCRIPT_HOME_DIR/download_deps_src.sh
 }
 
 build_libiconv() {
@@ -35,11 +37,11 @@ build_libiconv() {
 }
 
 build_libxml2() {
-	pushd $WORKDIR
-	rm -rf libxml2
-	git clone --depth=1 https://gitlab.gnome.org/GNOME/libxml2
-	cd libxml2
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+	pushd $SCRIPT_HOME_DIR/libxml2
+	cd ../libxml2
+	git clean -xdf
+	
+	cp $SCRIPT_HOME_DIR/android_cmake.sh . 
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
 	echo $PWD
@@ -47,39 +49,42 @@ build_libxml2() {
 	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
+	
 	popd
 }
 
 build_libiio() {
-	pushd $WORKDIR
-	rm -rf libiio
-	git clone https://github.com/analogdevicesinc/libiio
-	cd libiio
-	cp $SCRIPT_HOME_DIR/android_cmake.sh -DHAVE_DNS_SD=OFF
+	pushd $SCRIPT_HOME_DIR/libiio
+	cd ../libiio
+	git clean -xdf
+	
+	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
 	echo $PWD
-	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
+	./android_cmake.sh -B$BUILD_FOLDER -DHAVE_DNS_SD=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
 	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
+	
 	popd
 }
 
 build_libad9361 () {
-	pushd $WORKDIR
-	rm -rf libad9361-iio
-	git clone --depth=1 https://github.com/analogdevicesinc/libad9361-iio
-	cd libad9361-iio
+	pushd $SCRIPT_HOME_DIR/libad9361-iio
+	cd ../libad9361-iio
+	git clean -xdf
+
 	build_with_cmake
+	
 	popd
 }
 
 build_libm2k() {
-	pushd $WORKDIR
-	rm -rf libm2k
-	git clone --depth=1 https://github.com/analogdevicesinc/libm2k --branch master
-	cd libm2k
+	pushd $SCRIPT_HOME_DIR/libm2k
+	cd ../libm2k
+	git clean -xdf
+	
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
@@ -88,16 +93,15 @@ build_libm2k() {
 	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
+	
 	popd
-
 }
 
 build_gr-iio() {
-
-	pushd $WORKDIR
-	rm -rf gr-iio
-	git clone --depth=1 https://github.com/analogdevicesinc/gr-iio --branch upgrade-3.8
-	cd gr-iio
+	pushd $SCRIPT_HOME_DIR/gr-iio
+	cd ../gr-iio
+	git clean -xdf
+	
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
@@ -106,16 +110,15 @@ build_gr-iio() {
 	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
+	
 	popd
-
 }
 
 build_gr-m2k() {
+	pushd $SCRIPT_HOME_DIR/gr-m2k
+	cd ../gr-m2k
+	git clean -xdf
 
-	pushd $WORKDIR
-	rm -rf gr-m2k
-	git clone --depth=1 https://github.com/analogdevicesinc/gr-m2k --branch master
-	cd gr-m2k
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
@@ -124,15 +127,15 @@ build_gr-m2k() {
 	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
+	
 	popd
-
 }
 
 build_gr-scopy() {
-	pushd $WORKDIR
-	rm -rf gr-scopy
-	git clone --depth=1 https://github.com/analogdevicesinc/gr-scopy --branch master
-	cd gr-scopy
+	pushd $SCRIPT_HOME_DIR/gr-scopy
+	cd ../gr-scopy
+	git clean -xdf
+
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	rm -rf $BUILD_FOLDER
 	mkdir -p $BUILD_FOLDER
@@ -141,8 +144,8 @@ build_gr-scopy() {
 	cd $BUILD_FOLDER
 	make -j$JOBS
 	make -j$JOBS install
+	
 	popd
-
 }
 
 build_qwt() {
@@ -159,6 +162,8 @@ build_qwt() {
 
 	# Fix prefix
 	sed -i "s/^\\s*QWT_INSTALL_PREFIX.*$/QWT_INSTALL_PREFIX=\"\"/g" qwtconfig.pri
+
+	patch -p1 src/src.pro $SCRIPT_HOME_DIR/qwt_android.patch
 
 	$QMAKE ANDROID_ABIS="$ABI" ANDROID_MIN_SDK_VERSION=$API ANDROID_API_VERSION=$API INCLUDEPATH=$DEV_PREFIX/include LIBS=-L$DEV_PREFIX/lib qwt.pro
 	make -j$JOBS INSTALL_ROOT=$DEV_PREFIX install
@@ -250,6 +255,7 @@ build_sigcpp() {
 	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
 	tar xvf libsigc++-2.10.0.tar.xz
 	cd libsigc++-2.10.0
+	#  https://download.gnome.org/sources/glib/2.58/glib-2.58.3.tar.xz
 	cp $SCRIPT_HOME_DIR/android_configure.sh .
 	./android_configure.sh
 	make -j$JOBS
@@ -258,19 +264,19 @@ build_sigcpp() {
 }
 
 build_libsigrokdecode() {
+	pushd $SCRIPT_HOME_DIR/libsigrokdecode
+	cd ../libsigrokdecode
+	git clean -xdf
 
-	pushd $WORKDIR
-	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git
-	cd ${WORKDIR}/libsigrokdecode
 	cp $SCRIPT_HOME_DIR/android_configure.sh .
-
 	NOCONFIGURE=1 ./autogen.sh
 	./android_configure.sh
 	make -j$JOBS
 	make -j$JOBS install
+	
 	popd
-
 }
+
 build_python() {
 	pushd $WORKDIR
 	rm -rf Python-3.8.7
@@ -289,12 +295,10 @@ ac_cv_file__dev_ptc=no " > config.site
 
 
 build_libtinyiiod() {
-
-	pushd $WORKDIR
-	rm -rf scopy
-	git clone https://github.com/analogdevicesinc/libtinyiiod.git --branch master
-	cd ${WORKDIR}/libtinyiiod
-	rm -rf build*
+	pushd $SCRIPT_HOME_DIR/libtinyiiod
+	cd ../libtinyiiod
+	git clean -xdf
+	
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
 
@@ -303,15 +307,15 @@ build_libtinyiiod() {
 	make -j$JOBS
 	make -j$JOBS install
 	cd ..
+	
 	popd
 }
-build_scopy() {
 
-	pushd $WORKDIR
-	rm -rf scopy
-	git clone https://github.com/adisuciu/scopy.git --branch android
-	cd ${WORKDIR}/scopy
-	rm -rf build*
+build_scopy() {
+	pushd $SCRIPT_HOME_DIR/scopy
+	cd ../scopy
+	git clean -xdf
+	
 	cp $SCRIPT_HOME_DIR/android_cmake.sh .
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
 
@@ -321,35 +325,54 @@ build_scopy() {
 	make -j$JOBS install
 	cd ..
 	./android_deploy_qt.sh
+	
 	popd
 }
 
-#reset_build_env
-#build_libiconv
-#build_libffi
-#build_gettext
-#build_libiconv # HANDLE CIRCULAR DEP
-#build_glib
-#build_sigcpp
-#build_glibmm
-#build_libxml2
-#build_boost
-#move_boost_libs
-#build_libzmq
-#build_fftw
-#build_libgmp
+rm_libs() {
+
+	pushd $WORKDIR
+
+	cd $ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android
+	rm -f *.so
+
+	if [ $ABI = "armeabi-v7a" ]; then
+		find . ! -name 'libunwind.a' -type f -exec rm -f {} +	
+	else
+		rm -f *.a
+	fi
+	
+	cd $SCRIPT_HOME_DIR
+	popd
+
+}
+
+reset_build_env
+build_libiconv
+build_libffi
+build_gettext
+build_libiconv # HANDLE CIRCULAR DEP
+build_glib
+build_sigcpp
+build_glibmm
+build_libxml2
+build_boost
+move_boost_libs
+build_libzmq
+build_fftw
+build_libgmp
 build_libusb # THIS IS BUGGED I THINK
 build_libiio
 build_libad9361
 build_libm2k
-#build_volk
-#build_gnuradio
+build_volk
+build_gnuradio
 build_gr-iio
-#build_gr-scopy
+build_gr-scopy
 build_gr-m2k
-#build_qwt
-#move_qwt_libs
-#build_python
-#build_libsigrokdecode
-#build_libtinyiiod
-#build_scopy
+build_qwt
+move_qwt_libs
+build_python
+build_libsigrokdecode
+build_libtinyiiod
+build_scopy
