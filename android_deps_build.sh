@@ -353,7 +353,7 @@ move_boost_libs
 build_libzmq
 build_fftw
 build_libgmp
-build_libusb # THIS IS BUGGED I THINK
+build_libusb
 build_libiio
 build_libad9361
 build_libm2k
