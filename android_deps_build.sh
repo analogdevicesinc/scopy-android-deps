@@ -303,42 +303,6 @@ build_libtinyiiod() {
 	popd
 }
 
-build_scopy() {
-	pushd $SCRIPT_HOME_DIR/scopy
-	cd ../scopy
-	git clean -xdf
-	
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
-
-	./android_cmake.sh .
-	cd build_$ABI
-	make -j$JOBS
-	make -j$JOBS install
-	cd ..
-	./android_deploy_qt.sh
-	
-	popd
-}
-
-rm_libs() {
-
-	pushd $WORKDIR
-
-	cd $ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android
-	rm -f *.so
-
-	if [ $ABI = "armeabi-v7a" ]; then
-		find . ! -name 'libunwind.a' -type f -exec rm -f {} +	
-	else
-		rm -f *.a
-	fi
-	
-	cd $SCRIPT_HOME_DIR
-	popd
-
-}
-
 reset_build_env
 build_libiconv
 build_libffi
@@ -367,4 +331,3 @@ move_qwt_libs
 build_python
 build_libsigrokdecode
 build_libtinyiiod
-build_scopy

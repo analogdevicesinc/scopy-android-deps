@@ -28,7 +28,3 @@
 [submodule "libtinyiiod"]
 	path = libtinyiiod
 	url = https://github.com/analogdevicesinc/libtinyiiod.git
-[submodule "scopy"]
-	path = scopy
-	url = https://github.com/adisuciu/scopy.git
-	branch = android2
