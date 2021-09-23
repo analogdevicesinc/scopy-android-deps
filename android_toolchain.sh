@@ -83,7 +83,8 @@ export CFLAGS="-I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/incl
 export STAGING_DIR=${DEV_PREFIX}
 #export CFLAGS="--sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"
 export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
-export LDFLAGS="-L${SYSROOT}/usr/lib/$TARGET_BINUTILS/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
+export LDFLAGS_COMMON="-L${SYSROOT}/usr/lib/$TARGET_BINUTILS/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
+export LDFLAGS="$LDFLAGS_COMMON"
 
 echo ANDROID_SDK=$ANDROID_SDK_ROOT
 echo CMAKE=$CMAKE

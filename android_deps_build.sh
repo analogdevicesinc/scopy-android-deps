@@ -1,19 +1,7 @@
 #!/bin/bash
 set -xe
 source ./android_toolchain.sh $1 $2
-
-BUILD_FOLDER=./build_$ABI
-
-build_with_cmake() {
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf $BUILD_FOLDER
-	mkdir -p $BUILD_FOLDER
-	echo $PWD
-	./android_cmake.sh $@ -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd $BUILD_FOLDER
-	make -j$JOBS
-	make -j$JOBS install
-}
+source gnuradio-android/build.sh $1 $2
 
 reset_build_env() {
 	rm -rf $WORKDIR
@@ -21,93 +9,12 @@ reset_build_env() {
 	cd $WORKDIR
 }
 
-build_libiconv() {
-
-	pushd $WORKDIR
-	rm -rf libiconv-1.15
-	tar xvf $DEPS_SRC_PATH/libiconv-1.15.tar.gz
-	cd libiconv-1.15
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
-	./android_configure.sh --enable-static=no --enable-shared=yes
-	make -j$JOBS
-	make -j$JOBS install
-	popd
-}
-
-build_libxml2() {
-	pushd $SCRIPT_HOME_DIR/libxml2
-	cd ../libxml2
-	git clean -xdf
-	
-	cp $SCRIPT_HOME_DIR/android_cmake.sh . 
-	rm -rf $BUILD_FOLDER
-	mkdir -p $BUILD_FOLDER
-	echo $PWD
-	./android_cmake.sh -B$BUILD_FOLDER -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_PYTHON=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd $BUILD_FOLDER
-	make -j$JOBS
-	make -j$JOBS install
-	
-	popd
-}
-
-build_libiio() {
-	pushd $SCRIPT_HOME_DIR/libiio
-	cd ../libiio
-	git clean -xdf
-	
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf $BUILD_FOLDER
-	mkdir -p $BUILD_FOLDER
-	echo $PWD
-	./android_cmake.sh -B$BUILD_FOLDER -DHAVE_DNS_SD=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd $BUILD_FOLDER
-	make -j$JOBS
-	make -j$JOBS install
-	
-	popd
-}
-
-build_libad9361 () {
-	pushd $SCRIPT_HOME_DIR/libad9361-iio
-	cd ../libad9361-iio
-	git clean -xdf
-
-	build_with_cmake
-	
-	popd
-}
-
 build_libm2k() {
 	pushd $SCRIPT_HOME_DIR/libm2k
 	cd ../libm2k
 	git clean -xdf
-	
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf $BUILD_FOLDER
-	mkdir -p $BUILD_FOLDER
-	echo $PWD
-	./android_cmake.sh -B$BUILD_FOLDER -DENABLE_PYTHON=OFF -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd $BUILD_FOLDER
-	make -j$JOBS
-	make -j$JOBS install
-	
-	popd
-}
 
-build_gr-iio() {
-	pushd $SCRIPT_HOME_DIR/gr-iio
-	cd ../gr-iio
-	git clean -xdf
-	
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf $BUILD_FOLDER
-	mkdir -p $BUILD_FOLDER
-	echo $PWD
-	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd $BUILD_FOLDER
-	make -j$JOBS
-	make -j$JOBS install
+	build_with_cmake -DENABLE_PYTHON=OFF
 	
 	popd
 }
@@ -117,14 +24,7 @@ build_gr-m2k() {
 	cd ../gr-m2k
 	git clean -xdf
 
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf $BUILD_FOLDER
-	mkdir -p $BUILD_FOLDER
-	echo $PWD
-	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd $BUILD_FOLDER
-	make -j$JOBS
-	make -j$JOBS install
+	build_with_cmake
 	
 	popd
 }
@@ -134,14 +34,7 @@ build_gr-scopy() {
 	cd ../gr-scopy
 	git clean -xdf
 
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
-	rm -rf $BUILD_FOLDER
-	mkdir -p $BUILD_FOLDER
-	echo $PWD
-	./android_cmake.sh -B$BUILD_FOLDER -DCMAKE_VERBOSE_MAKEFILE=ON .
-	cd $BUILD_FOLDER
-	make -j$JOBS
-	make -j$JOBS install
+	build_with_cmake
 	
 	popd
 }
@@ -179,43 +72,14 @@ move_boost_libs() {
 	cp -R $DEV_PREFIX/$ABI/* $DEV_PREFIX
 }
 
-source gnuradio-android/build.sh
-
-build_libffi() {
-	pushd $WORKDIR
-	rm -rf libffi-3.3
-	tar xvf $DEPS_SRC_PATH/libffi-3.3.tar.gz
-	cd libffi-3.3
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
-	./android_configure.sh --cache-file=android.cache
-	make -j$JOBS
-	make -j$JOBS install
-	popd
-}
-build_gettext() {
-	pushd $WORKDIR
-	rm -rf gettext-0.21
-	tar xvf $DEPS_SRC_PATH/gettext-0.21.tar.gz
-	cd gettext-0.21
-	#./gitsub.sh pull
-	#NOCONFIGURE=1 ./autogen.sh
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
-	./android_configure.sh --cache-file=android.cache
-	make -j$JOBS
-	make -j$JOBS install
-	popd
-}
-
 build_glib() {
 	pushd $WORKDIR
 	rm -rf glib-2.58.3
-	#git clone https://git.gnome.org/browse/glib
 	tar xvf $DEPS_SRC_PATH/glib-2.58.3.tar.xz
 
-
-#CPPFLAGS=/path/to/standalone/include LDFLAGS=/path/to/standalone/lib ./configure \
-#--prefix=/path/to/standalone --bindir=$AS_BIN --build=i686-pc-linux-gnu --host=arm-linux-androideabi \
-#--cache-file=android.cache
+	#CPPFLAGS=/path/to/standalone/include LDFLAGS=/path/to/standalone/lib ./configure \
+	#--prefix=/path/to/standalone --bindir=$AS_BIN --build=i686-pc-linux-gnu --host=arm-linux-androideabi \
+	#--cache-file=android.cache
 	cd glib-2.58.3
 
 echo "glib_cv_stack_grows=no
@@ -224,10 +88,10 @@ ac_cv_func_posix_getpwuid_r=no
 ac_cv_func_posix_getgrgid_r=no " > android.cache
 
 	NOCONFIGURE=1 ./autogen.sh
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
-	./android_configure.sh --cache-file=android.cache --with-libiconv=gnu --disable-dtrace --disable-xattr --disable-systemtap --with-pcre=internal --enable-libmount=no
-	make -j$JOBS LDFLAGS="$LDFLAGS -lffi -lz"
-	make -j$JOBS install
+
+	LDFLAGS="$LDFLAGS_COMMON -lffi -lz"
+	android_configure --cache-file=android.cache --with-libiconv=gnu --disable-dtrace --disable-xattr --disable-systemtap --with-pcre=internal --enable-libmount=no
+
 	popd
 }
 
@@ -236,10 +100,10 @@ build_glibmm() {
 	pushd $WORKDIR
 	tar xvf $DEPS_SRC_PATH/glibmm-2.58.1.tar.xz
 	cd glibmm-2.58.1
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
-	./android_configure.sh
-	make -j$JOBS LDFLAGS="$LDFLAGS -lffi -lz"
-	make -j$JOBS install
+
+	LDFLAGS="$LDFLAGS_COMMON -lffi -lz"
+	android_configure
+
 	popd
 }
 
@@ -248,11 +112,9 @@ build_sigcpp() {
 	pushd $WORKDIR
 	tar xvf $DEPS_SRC_PATH/libsigc++-2.10.0.tar.xz
 	cd libsigc++-2.10.0
-	#  https://download.gnome.org/sources/glib/2.58/glib-2.58.3.tar.xz
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
-	./android_configure.sh
-	make -j$JOBS
-	make -j$JOBS install
+
+	android_configure
+
 	popd
 }
 
@@ -261,12 +123,9 @@ build_libsigrokdecode() {
 	cd ../libsigrokdecode
 	git clean -xdf
 
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
 	NOCONFIGURE=1 ./autogen.sh
-	./android_configure.sh
-	make -j$JOBS
-	make -j$JOBS install
-	
+	android_configure
+
 	popd
 }
 
@@ -276,11 +135,13 @@ build_python() {
 	tar xvf $DEPS_SRC_PATH/Python-3.8.7.tgz
 	cd Python-3.8.7
 	echo "ac_cv_file__dev_ptmx=no
-ac_cv_file__dev_ptc=no " > config.site
-	cp $SCRIPT_HOME_DIR/android_configure.sh .
+	ac_cv_file__dev_ptc=no " > config.site
+
+	cp $BUILD_ROOT/android_configure.sh .
 	CONFIG_SITE=config.site ./android_configure.sh --disable-ipv6
 	make -j$JOBS LDFLAGS="$LDFLAGS -lintl -liconv"
 	make -j$JOBS install
+
 	popd
 
 }
@@ -290,8 +151,8 @@ build_libtinyiiod() {
 	pushd $SCRIPT_HOME_DIR/libtinyiiod
 	cd ../libtinyiiod
 	git clean -xdf
-	
-	cp $SCRIPT_HOME_DIR/android_cmake.sh .
+
+	cp $BUILD_ROOT/android_cmake.sh .
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
 
 	./android_cmake.sh .
@@ -299,11 +160,12 @@ build_libtinyiiod() {
 	make -j$JOBS
 	make -j$JOBS install
 	cd ..
-	
+
 	popd
 }
 
 reset_build_env
+download_dependencies
 build_libiconv
 build_libffi
 build_gettext
