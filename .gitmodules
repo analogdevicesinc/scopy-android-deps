@@ -1,6 +1,6 @@
 [submodule "gnuradio-android"]
 	path = gnuradio-android
-	url = https://github.com/ioanachelaru/gnuradio-android
+	url = https://github.com/analogdevicesinc/gnuradio-android
 [submodule "libm2k"]
 	path = libm2k
 	url = https://github.com/analogdevicesinc/libm2k
