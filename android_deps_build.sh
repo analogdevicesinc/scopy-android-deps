@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 source ./android_toolchain.sh $1 $2
-source gnuradio-android/build.sh $1 $2
+source gnuradio-android/include_dependencies.sh $1 $2
 
 reset_build_env() {
 	rm -rf $WORKDIR
