@@ -1,0 +1,12 @@
+source build_system_setup.sh
+
+build_hostpython(){
+	cd deps_build_aarch64-linux-android
+	cd Python-$PYTHON_VERSION
+	./configure
+	CC="" make python 
+	echo $CC
+	mv python hostpython
+	cd ..
+}
+build_hostpython
