@@ -119,7 +119,7 @@ build_libsigrokdecode() {
 	pushd $SCRIPT_HOME_DIR/libsigrokdecode
 	git clean -xdf
 
-	NOCONFIGURE=1 ./autogen.sh
+	NOCONFIGURE=yes ./autogen.sh
 	android_configure
 
 	popd
@@ -127,16 +127,18 @@ build_libsigrokdecode() {
 
 build_python() {
 	pushd $WORKDIR
-	rm -rf Python-3.8.7
-	tar xvf $DEPS_SRC_PATH/Python-3.8.7.tgz
-	cd Python-3.8.7
-	echo "ac_cv_file__dev_ptmx=no
-	ac_cv_file__dev_ptc=no " > config.site
 
+	# Python should be cross-built with the same version that is available on host, if nothing is available, it should be built with the script ./build_host_python
+	cd Python-$PYTHON_VERSION
+	autoreconf
 	cp $BUILD_ROOT/android_configure.sh .
-	CONFIG_SITE=config.site ./android_configure.sh --disable-ipv6
-	make -j$JOBS LDFLAGS="$LDFLAGS -lintl -liconv"
-	make -j$JOBS install
+	ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_func_pipe2=no ac_cv_func_fdatasync=no ac_cv_func_killpg=no ac_cv_func_waitid=no ac_cv_func_sigaltstack=no ./android_configure.sh  --build=x86_64-linux-gnu --disable-ipv6
+	sed -i "s/^#zlib/zlib/g" Modules/Setup
+	sed -i "s/^#math/math/g" Modules/Setup
+	sed -i "s/^#time/time/g" Modules/Setup
+	sed -i "s/^#_struct/_struct/g" Modules/Setup
+
+	make -j$JOBS LDFLAGS="$LDFLAGS -lintl -liconv -lz -lm"  install
 
 	popd
 
