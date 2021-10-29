@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 source ./android_toolchain.sh $1 $2
-source gnuradio-android/build.sh $1 $2
+source gnuradio-android/include_dependencies.sh
 
 reset_build_env() {
 	rm -rf $WORKDIR
@@ -11,7 +11,6 @@ reset_build_env() {
 
 build_libm2k() {
 	pushd $SCRIPT_HOME_DIR/libm2k
-	cd ../libm2k
 	git clean -xdf
 
 	build_with_cmake -DENABLE_PYTHON=OFF
@@ -21,7 +20,6 @@ build_libm2k() {
 
 build_gr-m2k() {
 	pushd $SCRIPT_HOME_DIR/gr-m2k
-	cd ../gr-m2k
 	git clean -xdf
 
 	build_with_cmake
@@ -31,7 +29,6 @@ build_gr-m2k() {
 
 build_gr-scopy() {
 	pushd $SCRIPT_HOME_DIR/gr-scopy
-	cd ../gr-scopy
 	git clean -xdf
 
 	build_with_cmake
@@ -120,7 +117,6 @@ build_sigcpp() {
 
 build_libsigrokdecode() {
 	pushd $SCRIPT_HOME_DIR/libsigrokdecode
-	cd ../libsigrokdecode
 	git clean -xdf
 
 	NOCONFIGURE=1 ./autogen.sh
@@ -149,7 +145,6 @@ build_python() {
 
 build_libtinyiiod() {
 	pushd $SCRIPT_HOME_DIR/libtinyiiod
-	cd ../libtinyiiod
 	git clean -xdf
 
 	cp $BUILD_ROOT/android_cmake.sh .
