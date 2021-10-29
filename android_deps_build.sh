@@ -37,21 +37,19 @@ build_gr-scopy() {
 }
 
 build_qwt() {
-	pushd $WORKDIR
-	QWT_NAME=qwt-code
-	svn checkout svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1-multiaxes $QWT_NAME
-	cd $QWT_NAME
+	pushd $SCRIPT_HOME_DIR/qwt
+	git clean -xdf
 
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtMathML$/#/g" qwtconfig.pri
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtDesigner$/#/g" qwtconfig.pri
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtExamples$/#/g" qwtconfig.pri
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtPlayground$/#/g" qwtconfig.pri
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtTests$/#/g" qwtconfig.pri
+#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtMathML$/#/g" qwtconfig.pri
+#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtDesigner$/#/g" qwtconfig.pri
+#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtExamples$/#/g" qwtconfig.pri
+#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtPlayground$/#/g" qwtconfig.pri
+#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtTests$/#/g" qwtconfig.pri
 
 	# Fix prefix
-	sed -i "s/^\\s*QWT_INSTALL_PREFIX.*$/QWT_INSTALL_PREFIX=\"\"/g" qwtconfig.pri
+#	sed -i "s/^\\s*QWT_INSTALL_PREFIX.*$/QWT_INSTALL_PREFIX=\"\"/g" qwtconfig.pri
 
-	patch -p1 src/src.pro $SCRIPT_HOME_DIR/qwt_android.patch
+#	patch -p1 src/src.pro $SCRIPT_HOME_DIR/qwt_android.patch
 
 	$QMAKE ANDROID_ABIS="$ABI" ANDROID_MIN_SDK_VERSION=$API ANDROID_API_VERSION=$API INCLUDEPATH=$DEV_PREFIX/include LIBS=-L$DEV_PREFIX/lib qwt.pro
 	make -j$JOBS INSTALL_ROOT=$DEV_PREFIX install
@@ -70,21 +68,24 @@ move_boost_libs() {
 }
 
 build_glib() {
-	pushd $WORKDIR
-	rm -rf glib-2.58.3
-	tar xvf $DEPS_SRC_PATH/glib-2.58.3.tar.xz
+#	pushd $WORKDIR
+#	rm -rf glib-2.58.3
+#	tar xvf $DEPS_SRC_PATH/glib-2.58.3.tar.xz
+
+#	cd glib-2.58.3
+	pushd $SCRIPT_HOME_DIR/glib
+	git clean -xdf
 
 	#CPPFLAGS=/path/to/standalone/include LDFLAGS=/path/to/standalone/lib ./configure \
 	#--prefix=/path/to/standalone --bindir=$AS_BIN --build=i686-pc-linux-gnu --host=arm-linux-androideabi \
 	#--cache-file=android.cache
-	cd glib-2.58.3
 
 echo "glib_cv_stack_grows=no
 glib_cv_uscore=no
 ac_cv_func_posix_getpwuid_r=no
 ac_cv_func_posix_getgrgid_r=no " > android.cache
 
-	NOCONFIGURE=1 ./autogen.sh
+	NOCONFIGURE=yes ./autogen.sh
 
 	LDFLAGS="$LDFLAGS_COMMON -lffi -lz"
 	android_configure --cache-file=android.cache --with-libiconv=gnu --disable-dtrace --disable-xattr --disable-systemtap --with-pcre=internal --enable-libmount=no
@@ -94,23 +95,22 @@ ac_cv_func_posix_getgrgid_r=no " > android.cache
 
 build_glibmm() {
 	echo "### Building glibmm - 2.58.1"
-	pushd $WORKDIR
-	tar xvf $DEPS_SRC_PATH/glibmm-2.58.1.tar.xz
-	cd glibmm-2.58.1
+	pushd $SCRIPT_HOME_DIR/glibmm
+	git clean -xdf
 
 	LDFLAGS="$LDFLAGS_COMMON -lffi -lz"
-	android_configure
+	android_configure --disable-documentation
 
 	popd
 }
 
 build_sigcpp() {
 	echo "### Building libsigc++ -2.10.0"
-	pushd $WORKDIR
-	tar xvf $DEPS_SRC_PATH/libsigc++-2.10.0.tar.xz
-	cd libsigc++-2.10.0
+	pushd $SCRIPT_HOME_DIR/libsigcplusplus
+	git clean -xdf
 
-	android_configure
+	NOCONFIGURE=yes	./autogen.sh
+	android_configure --disable-documentation
 
 	popd
 }
@@ -126,10 +126,9 @@ build_libsigrokdecode() {
 }
 
 build_python() {
-	pushd $WORKDIR
+	pushd $SCRIPT_HOME_DIR/python
 
 	# Python should be cross-built with the same version that is available on host, if nothing is available, it should be built with the script ./build_host_python
-	cd Python-$PYTHON_VERSION
 	autoreconf
 	cp $BUILD_ROOT/android_configure.sh .
 	ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_func_pipe2=no ac_cv_func_fdatasync=no ac_cv_func_killpg=no ac_cv_func_waitid=no ac_cv_func_sigaltstack=no ./android_configure.sh  --build=x86_64-linux-gnu --disable-ipv6
@@ -144,7 +143,58 @@ build_python() {
 
 }
 
+build_gr-iio3.8() {
+        pushd ${SCRIPT_HOME_DIR}/gr-iio-3.8
+        git clean -xdf
 
+	build_with_cmake -DWITH_PYTHON=OFF
+
+        popd
+}
+
+build_gnuradio3.8() {
+	pushd ${SCRIPT_HOME_DIR}/gnuradio-3.8
+	git clean -xdf
+
+	mkdir build
+	cd build
+
+	echo "$LDFLAGS_COMMON"
+
+	$CMAKE -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+	  -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake \
+	  -DANDROID_ABI=$ABI -DANDROID_ARM_NEON=ON \
+	  -DANDROID_STL=c++_shared \
+	  -DANDROID_NATIVE_API_LEVEL=28 \
+	  -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+	  -DENABLE_INTERNAL_VOLK=OFF \
+	  -DBOOST_ROOT=${PREFIX} \
+	  -DBoost_COMPILER=-clang \
+	  -DBoost_USE_STATIC_LIBS=ON \
+	  -DBoost_ARCHITECTURE=-a32 \
+	  -DCMAKE_FIND_ROOT_PATH=${PREFIX} \
+	  -DENABLE_DOXYGEN=OFF \
+	  -DENABLE_SPHINX=OFF \
+	  -DENABLE_PYTHON=OFF \
+	  -DENABLE_TESTING=OFF \
+	  -DENABLE_GR_FEC=OFF \
+	  -DENABLE_GR_AUDIO=OFF \
+	  -DENABLE_GR_DTV=OFF \
+	  -DENABLE_GR_CHANNELS=OFF \
+	  -DENABLE_GR_VOCODER=OFF \
+	  -DENABLE_GR_TRELLIS=OFF \
+	  -DENABLE_GR_WAVELET=OFF \
+	  -DENABLE_GR_CTRLPORT=OFF \
+	  -DENABLE_CTRLPORT_THRIFT=OFF \
+	  -DCMAKE_C_FLAGS="$CFLAGS" \
+	  -DCMAKE_CXX_FLAGS="$CPPFLAGS" \
+	  -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS_COMMON" \
+	  -DCMAKE_VERBOSE_MAKEFILE=ON \
+	   ../
+	make -j ${JOBS}
+	make install
+	popd
+}
 build_libtinyiiod() {
 	pushd $SCRIPT_HOME_DIR/libtinyiiod
 	git clean -xdf
@@ -162,7 +212,6 @@ build_libtinyiiod() {
 }
 
 reset_build_env
-download_dependencies
 build_libiconv
 build_libffi
 build_gettext
@@ -181,8 +230,8 @@ build_libiio
 build_libad9361
 build_libm2k
 build_volk
-build_gnuradio
-build_gr-iio
+build_gnuradio3.8
+build_gr-iio3.8
 build_gr-scopy
 build_gr-m2k
 build_qwt

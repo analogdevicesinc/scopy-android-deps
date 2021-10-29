@@ -16,3 +16,24 @@
 [submodule "libtinyiiod"]
 	path = libtinyiiod
 	url = https://github.com/analogdevicesinc/libtinyiiod.git
+[submodule "python"]
+	path = python
+	url = https://github.com/cseci/python
+[submodule "libsigcplusplus"]
+	path = libsigcplusplus
+	url = https://github.com/cseci/libsigcplusplus
+[submodule "glibmm"]
+	path = glibmm
+	url = https://github.com/cseci/glibmm
+[submodule "gnuradio-3.8"]
+	path = gnuradio-3.8
+	url = https://github.com/analogdevicesinc/gnuradio
+[submodule "qwt"]
+	path = qwt
+	url = https://github.com/cseci/qwt
+[submodule "gr-iio-3.8"]
+	path = gr-iio-3.8
+	url = https://github.com/analogdevicesinc/gr-iio
+[submodule "glib"]
+	path = glib
+	url = https://github.com/cseci/glib

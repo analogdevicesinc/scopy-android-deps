@@ -4,7 +4,7 @@ ARG USER=runner
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
-RUN apt-get install -y git vim wget unzip sudo xserver-xorg openjdk-11-jre cmake libtool build-essential pkg-config autogen bison flex texinfo python-dev python-mako python-six swig3.0 python3-mako python3-numpy gettext libglib2.0-dev texinfo subversion libxkbcommon-x11-0 libxcb-xinerama0 libqt5gui5 libncurses5
+RUN apt-get install -y git vim wget unzip sudo xserver-xorg openjdk-11-jre cmake libtool build-essential pkg-config autogen bison flex texinfo python-dev python-mako python-six swig3.0 python3-mako python3-numpy gettext libglib2.0-dev texinfo subversion libxkbcommon-x11-0 libxcb-xinerama0 libqt5gui5 libncurses5 autoconf-archive mm-common
 
 RUN groupadd -g 1000 -r $USER
 RUN useradd -u 1000 -g 1000 --create-home -r $USER
@@ -51,33 +51,13 @@ RUN sudo apt remove qtchooser
 RUN sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
 WORKDIR /home/$USER/src
-RUN echo 11
-RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch try4
+RUN echo 12
+RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch master
 
 WORKDIR /home/$USER/src/scopy-android-deps
-RUN ./download_deps_src.sh $USER
 RUN ./move_libs.sh aarch64 $USER
 RUN ./rename_gradle.sh $USER
-
-RUN git submodule update --init gnuradio-android/
-RUN git submodule update --init gr-m2k/
-RUN git submodule update --init gr-scopy/
-RUN git submodule update --init libm2k/
-RUN git submodule update --init libsigrokdecode/
-RUN git submodule update --init --recursive libtinyiiod/
-
-WORKDIR /home/$USER/src/scopy-android-deps/gnuradio-android
-RUN git submodule update --init --recursive Boost-for-Android/
-RUN git submodule update --init libxml2/
-RUN git submodule update --init --recursive libiio/
-RUN git submodule update --init libad9361-iio/
-RUN git submodule update --init gr-iio/
-RUN git submodule update --init --recursive fftw-3.3.9/
-RUN git submodule update --init --recursive gnuradio/
-RUN git submodule update --init --recursive libgmp/
-RUN git submodule update --init --recursive libusb/
-RUN git submodule update --init --recursive libzmq/
-RUN git submodule update --init --recursive volk/ 
+RUN ./download_deps_src.sh
 
 WORKDIR /home/$USER/src/scopy-android-deps
 ENV ANDROID_TOOLCHAIN_LOCATION=/home/$USER/src/scopy-android-deps
