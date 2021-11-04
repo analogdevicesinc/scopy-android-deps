@@ -36,9 +36,9 @@ popd
 }
 
 download_deps() {
-	rm -rf $DEPS_SRC_PATH
-	mkdir -p $DEPS_SRC_PATH
-	pushd $DEPS_SRC_PATH
+#	rm -rf $DEPS_SRC_PATH
+#	mkdir -p $DEPS_SRC_PATH
+#	pushd $DEPS_SRC_PATH
 
 #	wget https://download.gnome.org/sources/glib/2.58/glib-2.58.3.tar.xz
 #	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.58/glibmm-2.58.1.tar.xz
@@ -49,11 +49,13 @@ download_deps() {
 
 install_jdk() {
 	cd $HOME
-	sudo apt-get -y install openjdk-17-jdk
-#	wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn-pub/java/jdk/16.0.2%2B7/d4a915d82b4c4fbb9bde534da945d746/jdk-16.0.2_linux-x64_bin.tar.gz
-#	tar xvf jdk-16.0.2_linux-x64_bin.tar.gz
+#	we're using gradle 6.3 so we need to use jdk 14 at most
+#	https://docs.gradle.org/current/userguide/compatibility.html
+
+	wget https://download.java.net/openjdk/jdk14/ri/openjdk-14+36_linux-x64_bin.tar.gz
+	tar xvf openjdk-14+36_linux-x64_bin.tar.gz
 }
 
 recurse_submodules
-#download_deps
-#install_jdk
+download_deps
+install_jdk
