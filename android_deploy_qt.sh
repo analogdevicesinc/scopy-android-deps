@@ -29,7 +29,7 @@ copy-iio-emu() {
 	echo -- will mark it as an executable 
 	echo -- surely there is a better way to do this 
 
-	mv $ARG1/iio-emu/iio-emu android/libs/$ABI/iio-emu.so
+	cp $ARG1/iio-emu/iio-emu android/libs/$ABI/iio-emu.so
 }
 
 copy-all-libs-from-staging
