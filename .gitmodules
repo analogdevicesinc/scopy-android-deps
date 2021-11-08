@@ -37,3 +37,6 @@
 [submodule "glib"]
 	path = glib
 	url = https://github.com/cseci/glib
+[submodule "log4cpp"]
+	path = log4cpp
+	url = https://github.com/cseci/log4cpp

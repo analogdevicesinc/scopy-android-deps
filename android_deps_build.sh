@@ -152,6 +152,16 @@ build_gr-iio3.8() {
         popd
 }
 
+build_log4cpp() {
+
+	pushd ${SCRIPT_HOME_DIR}/log4cpp
+	git clean -xdf
+	build_with_cmake 
+	popd
+
+}
+
+
 build_gnuradio3.8() {
 	pushd ${SCRIPT_HOME_DIR}/gnuradio-3.8
 	git clean -xdf
@@ -230,6 +240,7 @@ build_libiio
 build_libad9361
 build_libm2k
 build_volk
+# build_log4cpp # not used
 build_gnuradio3.8
 build_gr-iio3.8
 build_gr-scopy
