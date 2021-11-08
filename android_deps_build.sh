@@ -22,7 +22,7 @@ build_gr-m2k() {
 	pushd $SCRIPT_HOME_DIR/gr-m2k
 	git clean -xdf
 
-	build_with_cmake
+	build_with_cmake -DWITH_PYTHON=OFF
 	
 	popd
 }
@@ -31,7 +31,7 @@ build_gr-scopy() {
 	pushd $SCRIPT_HOME_DIR/gr-scopy
 	git clean -xdf
 
-	build_with_cmake
+	build_with_cmake -DWITH_PYTHON=OFF
 	
 	popd
 }
