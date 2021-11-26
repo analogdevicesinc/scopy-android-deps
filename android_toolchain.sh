@@ -3,6 +3,9 @@
 source ./build_system_setup.sh $2
 
 export NDK_VERSION=21.3.6528147
+#export NDK_VERSION=21.4.7075529
+#export NDK_VERSION=22.1.7171670
+#export NDK_VERSION=23.1.7779620
 export API=28 # need ABI at least 28 for glob from my tests
 #export JOBS=$(getconf _NPROCESSORS_ONLN)
 export JOBS=9
@@ -48,7 +51,7 @@ export TARGET_BINUTILS=i686-linux-android
 #################################
 fi
 
-export WORKDIR=$SCRIPT_HOME_DIR/deps_build_$TARGET_PREFIX
+export WORKDIR=$SCRIPT_HOME_DIR/deps_build_${TARGET_PREFIX}_$BUILD_TYPE
 
 # This is just an empty directory where I want the built objects to be installed
 export DEV_PREFIX=$WORKDIR/out
@@ -73,10 +76,10 @@ export CXX=$TOOLCHAIN/bin/$TARGET_PREFIX$API-clang++
 export CPP="$CC -E"
 export AR=$TOOLCHAIN/bin/llvm-ar
 export AS=${CC}
-export NM=$TOOLCHAIN/bin/${TARGET_BINUTILS}-nm
-export STRIP=${TOOLCHAIN_BIN}/arm-linux-androideabi-strip
-export READELF=$TOOLCHAIN/bin/${TARGET_BINUTILS}-readelf
-export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld
+export NM=$TOOLCHAIN/bin/llvm-nm
+export STRIP=$TOOLCHAIN/bin/llvm-strip
+export READELF=$TOOLCHAIN/bin/llvm-readelf
+export LD=$TOOLCHAIN/bin/ld.lld
 export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
 
 export CFLAGS="-I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"

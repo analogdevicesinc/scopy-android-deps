@@ -2,7 +2,7 @@
 set -xe
 
 if [ $# -ne 1 ]; then
-        ARG1=build_$ABI
+        ARG1=build_${ABI}_${BUILD_TYPE}
 else
         ARG1=$1
 fi
@@ -26,8 +26,8 @@ copy-libsigrokdecode() {
 copy-iio-emu() {
 	echo -- Deploying iio-emu as iio-emu.so in ./android/libs/$ABI
 	echo -- this hack will deploy iio-emu with .so extension so the bundle tool
-	echo -- will mark it as an executable 
-	echo -- surely there is a better way to do this 
+	echo -- will mark it as an executable
+	echo -- surely there is a better way to do this
 
 	cp $ARG1/iio-emu/iio-emu android/libs/$ABI/iio-emu.so
 }
