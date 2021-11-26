@@ -14,7 +14,7 @@ build_libm2k() {
 	git clean -xdf
 
 	build_with_cmake -DENABLE_PYTHON=OFF
-	
+
 	popd
 }
 
@@ -23,7 +23,7 @@ build_gr-m2k() {
 	git clean -xdf
 
 	build_with_cmake -DWITH_PYTHON=OFF
-	
+
 	popd
 }
 
@@ -32,7 +32,7 @@ build_gr-scopy() {
 	git clean -xdf
 
 	build_with_cmake -DWITH_PYTHON=OFF
-	
+
 	popd
 }
 
@@ -52,6 +52,7 @@ build_qwt() {
 #	patch -p1 src/src.pro $SCRIPT_HOME_DIR/qwt_android.patch
 
 	$QMAKE ANDROID_ABIS="$ABI" ANDROID_MIN_SDK_VERSION=$API ANDROID_API_VERSION=$API INCLUDEPATH=$DEV_PREFIX/include LIBS=-L$DEV_PREFIX/lib qwt.pro
+	make -j$JOBS
 	make -j$JOBS INSTALL_ROOT=$DEV_PREFIX install
 
 	popd
@@ -68,11 +69,6 @@ move_boost_libs() {
 }
 
 build_glib() {
-#	pushd $WORKDIR
-#	rm -rf glib-2.58.3
-#	tar xvf $DEPS_SRC_PATH/glib-2.58.3.tar.xz
-
-#	cd glib-2.58.3
 	pushd $SCRIPT_HOME_DIR/glib
 	git clean -xdf
 
@@ -156,26 +152,22 @@ build_log4cpp() {
 
 	pushd ${SCRIPT_HOME_DIR}/log4cpp
 	git clean -xdf
-	build_with_cmake 
+	build_with_cmake
 	popd
 
 }
-
 
 build_gnuradio3.8() {
 	pushd ${SCRIPT_HOME_DIR}/gnuradio-3.8
 	git clean -xdf
 
+	rm -rf build
 	mkdir build
 	cd build
 
 	echo "$LDFLAGS_COMMON"
 
-	$CMAKE -DCMAKE_INSTALL_PREFIX=${PREFIX} \
-	  -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake \
-	  -DANDROID_ABI=$ABI -DANDROID_ARM_NEON=ON \
-	  -DANDROID_STL=c++_shared \
-	  -DANDROID_NATIVE_API_LEVEL=28 \
+	build_with_cmake  \
 	  -DPYTHON_EXECUTABLE=/usr/bin/python3 \
 	  -DENABLE_INTERNAL_VOLK=OFF \
 	  -DBOOST_ROOT=${PREFIX} \
@@ -196,9 +188,6 @@ build_gnuradio3.8() {
 	  -DENABLE_GR_WAVELET=OFF \
 	  -DENABLE_GR_CTRLPORT=OFF \
 	  -DENABLE_CTRLPORT_THRIFT=OFF \
-	  -DCMAKE_C_FLAGS="$CFLAGS" \
-	  -DCMAKE_CXX_FLAGS="$CPPFLAGS" \
-	  -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS_COMMON" \
 	  -DCMAKE_VERBOSE_MAKEFILE=ON \
 	   ../
 	make -j ${JOBS}
@@ -212,11 +201,7 @@ build_libtinyiiod() {
 	cp $BUILD_ROOT/android_cmake.sh .
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
 
-	./android_cmake.sh .
-	cd build_$ABI
-	make -j$JOBS
-	make -j$JOBS install
-	cd ..
+	build_with_cmake
 
 	popd
 }
@@ -232,7 +217,7 @@ build_glibmm
 build_libxml2
 build_boost
 move_boost_libs
-build_libzmq
+#build_libzmq
 build_fftw
 build_libgmp
 build_libusb
@@ -240,7 +225,7 @@ build_libiio
 build_libad9361
 build_libm2k
 build_volk
-# build_log4cpp # not used
+#build_log4cpp # not used
 build_gnuradio3.8
 build_gr-iio3.8
 build_gr-scopy

@@ -48,7 +48,7 @@ export TARGET_BINUTILS=i686-linux-android
 #################################
 fi
 
-export WORKDIR=$SCRIPT_HOME_DIR/deps_build_$TARGET_PREFIX
+export WORKDIR=$SCRIPT_HOME_DIR/deps_build_${TARGET_PREFIX}_$BUILD_TYPE
 
 # This is just an empty directory where I want the built objects to be installed
 export DEV_PREFIX=$WORKDIR/out
@@ -73,15 +73,14 @@ export CXX=$TOOLCHAIN/bin/$TARGET_PREFIX$API-clang++
 export CPP="$CC -E"
 export AR=$TOOLCHAIN/bin/llvm-ar
 export AS=${CC}
-export NM=$TOOLCHAIN/bin/${TARGET_BINUTILS}-nm
-export STRIP=${TOOLCHAIN_BIN}/arm-linux-androideabi-strip
-export READELF=$TOOLCHAIN/bin/${TARGET_BINUTILS}-readelf
-export LD=$TOOLCHAIN/bin/${TARGET_BINUTILS}-ld
+export NM=$TOOLCHAIN/bin/llvm-nm
+export STRIP=$TOOLCHAIN/bin/llvm-strip
+export READELF=$TOOLCHAIN/bin/llvm-readelf
+export LD=$TOOLCHAIN/bin/ld.lld
 export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
 
 export CFLAGS="-I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"
 export STAGING_DIR=${DEV_PREFIX}
-#export CFLAGS="--sysroot=${SYSROOT} -I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"
 export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
 export LDFLAGS_COMMON="-L${SYSROOT}/usr/lib/$TARGET_BINUTILS/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
 export LDFLAGS="$LDFLAGS_COMMON"

@@ -1,3 +1,4 @@
+#docker build -t analogdevices/scopy-build:android --build-arg QT_USER=<your_user> --build-arg QT_PASSWORD=<your_password> .
 FROM ubuntu:20.04
 
 ARG USER=runner
@@ -51,7 +52,7 @@ RUN sudo apt remove qtchooser
 RUN sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
 WORKDIR /home/$USER/src
-RUN echo 12
+RUN echo 14
 RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch master
 
 WORKDIR /home/$USER/src/scopy-android-deps
