@@ -10,7 +10,6 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_FIND_DEBUG_MODE OFF)
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check https://doc.qt.io/qt/deployment-android.html for more information.
 # They need to be set before the find_package( ...) calls below.
@@ -49,9 +48,9 @@ message(123 ${CMAKE_STAGING_PREFIX})
 
 message(123 ${CMAKE_PREFIX_PATH})
 
-set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_package(libm2k REQUIRED PATH_SUFFIXES lib/cmake/libm2k)
-set(CMAKE_FIND_DEBUG_MODE FALSE)
+#add_subdirectory(libm2k)
+
 
 
 IF(NOT DEFINED BOOST_ROOT)
@@ -69,9 +68,9 @@ link_directories(
 	${Boost_LIBRARY_DIRS}
 	${GNURADIO_RUNTIME_LIBRARY_DIRS}
 	)
-set(CMAKE_FIND_DEBUG_MODE TRUE)
-find_package(gnuradio-iio REQUIRED PATH_SUFFIXES iio)
-set(CMAKE_FIND_DEBUG_MODE FALSE)
+#set(CMAKE_FIND_DEBUG_MODE TRUE)
+find_package(gnuradio-iio REQUIRED PATH_SUFFIXES lib/iio)
+#set(CMAKE_FIND_DEBUG_MODE FALSE)
 
 find_library(QWT_LIBRARIES REQUIRED NAMES qwt qwt_${ANDROID_ABI})
 
@@ -79,7 +78,7 @@ message(${PKG_CONFIG_EXECUTABLE})
 #pkg_check_modules(Qt5Svg REQUIRED Qt5Svg_x86_64)
 message(aa ${Qt5Svg_LIBRARIES})
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_FIND_DEBUG_MODE ON)
+#set(CMAKE_FIND_DEBUG_MODE ON)
 set(ENV{PKG_CONFIG_PATH} /home/adi/android/scopy-android-deps/deps_build_x86_64-linux-android/out/lib/pkgconfig)
 message($ENV{PKG_CONFIG_PATH})
 #pkg_check_modules(qwt REQUIRED Qt5Qwt6)
@@ -95,7 +94,7 @@ pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
 message(${LIBSIGROK_DECODERS_DIR})
 
-set(CMAKE_FIND_DEBUG_MODE OFF)
+#set(CMAKE_FIND_DEBUG_MODE OFF)
 message(${ANDROID_PACKAGE_SOURCE_DIR} aaa)
 
 include_directories(${IIO_INCLUDE_DIR}
