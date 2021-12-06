@@ -440,3 +440,75 @@ void MainWindow::on_pushButton_2_clicked()
 
 }
 
+
+void MainWindow::on_pushButton_3_clicked()
+{
+	unsigned int nb_contexts;
+	QStringList uris;
+
+	struct iio_scan_context *scan_ctx = iio_create_scan_context("usb", 0);
+
+	if (!scan_ctx) {
+		ui->textEdit_2->append("Unable to create scan context!\n");
+		return;
+
+	}
+
+	struct iio_context_info **info;
+	ssize_t ret = iio_scan_context_get_info_list(scan_ctx, &info);
+
+	if (ret < 0) {
+		ui->textEdit_2->append( "Unable to scan!");
+		return;
+	}
+
+	nb_contexts = static_cast<unsigned int>(ret);
+	qDebug()<<nb_contexts << "contexts found ";
+	if(nb_contexts!=1) {
+		ui->textEdit_2->append("nb_contexts!=1");
+		return;
+	}
+	const char *uri;
+	uri = iio_context_info_get_uri(info[0]);
+	ui->textEdit_2->append("Found: "+ QString(uri));
+	ctx = iio_create_context_from_uri(uri);
+	ui->textEdit_2->append("Connected: "+ QString(uri));
+
+	int nb_devices = iio_context_get_devices_count(ctx);
+	ui->textEdit_2->append("Found " + QString::number(nb_devices) + "devices:");
+	for(int i=0;i<nb_devices;i++)
+	{
+		struct iio_device *dev;
+		const char *dev_name;
+		dev = iio_context_get_device(ctx,i);
+		dev_name = iio_device_get_name(dev);
+		ui->textEdit_2->append(QString::number(i)+": " + QString(dev_name));
+	}
+
+
+}
+
+
+void MainWindow::on_pushButton_4_clicked()
+{
+	QElapsedTimer t;
+	int n=1000;
+
+	ui->textEdit_2->append("Reading attribute "+QString::number(n)+" times");
+	auto m2k = libm2k::context::m2kOpen(ctx,"");
+
+	t.start();
+	struct iio_device *dev;
+	dev = iio_context_find_device(ctx,"ad9361-phy");
+	/*for(int i=0;i<n;i++)
+	{
+		char val[1000];
+		iio_device_attr_read(dev,"calib_mode",val,1000);
+	}*/
+
+	m2k->calibrate();
+	qint64 elapsed = t.elapsed();
+	ui->textEdit_2->append("Reading took " + QString::number(elapsed,10));
+
+}
+
