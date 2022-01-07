@@ -40,27 +40,15 @@ build_qwt() {
 	pushd $SCRIPT_HOME_DIR/qwt
 	git clean -xdf
 
-#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtMathML$/#/g" qwtconfig.pri
-#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtDesigner$/#/g" qwtconfig.pri
-#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtExamples$/#/g" qwtconfig.pri
-#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtPlayground$/#/g" qwtconfig.pri
-#	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtTests$/#/g" qwtconfig.pri
-
-	# Fix prefix
-#	sed -i "s/^\\s*QWT_INSTALL_PREFIX.*$/QWT_INSTALL_PREFIX=\"\"/g" qwtconfig.pri
-
-#	patch -p1 src/src.pro $SCRIPT_HOME_DIR/qwt_android.patch
-
 	$QMAKE ANDROID_ABIS="$ABI" ANDROID_MIN_SDK_VERSION=$API ANDROID_API_VERSION=$API INCLUDEPATH=$DEV_PREFIX/include LIBS=-L$DEV_PREFIX/lib qwt.pro
 	make -j$JOBS
 	make -j$JOBS INSTALL_ROOT=$DEV_PREFIX install
-
 	popd
-	# qwtpolar is now part of qwt
 
 }
 
 move_qwt_libs (){
+	cp -R $DEV_PREFIX/usr/local/* $DEV_PREFIX/
 	cp -R $DEV_PREFIX/libs/$ABI/* $DEV_PREFIX/lib # another hack
 }
 
