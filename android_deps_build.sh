@@ -193,6 +193,15 @@ build_libtinyiiod() {
 
 	popd
 }
+build_qadvanceddocking() {
+	pushd $SCRIPT_HOME_DIR/qadvanceddocking
+	git clean -xdf
+	cp $BUILD_ROOT/android_cmake.sh .
+	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
+
+	build_with_cmake
+	popd
+}
 
 reset_build_env
 build_libiconv
@@ -220,6 +229,7 @@ build_gr-scopy
 build_gr-m2k
 build_qwt
 move_qwt_libs
+#build_qadvanceddocking
 build_python
 build_libsigrokdecode
 build_libtinyiiod

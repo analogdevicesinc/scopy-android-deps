@@ -40,3 +40,6 @@
 [submodule "log4cpp"]
 	path = log4cpp
 	url = https://github.com/cseci/log4cpp
+[submodule "qadvanceddocking"]
+	path = qadvanceddocking
+	url = https://github.com/cseci/Qt-Advanced-Docking-System
