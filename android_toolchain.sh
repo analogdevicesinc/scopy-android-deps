@@ -3,7 +3,7 @@
 source ./build_system_setup.sh $2
 
 export NDK_VERSION=21.3.6528147
-export API=28 # need ABI at least 28 for glob from my tests
+export API=26 # need ABI at least 28 for glob from my tests
 #export JOBS=$(getconf _NPROCESSORS_ONLN)
 export JOBS=9
 export HOST_ARCH=linux-x86_64
