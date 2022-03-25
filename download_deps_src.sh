@@ -29,7 +29,7 @@ git submodule update --init --recursive fftw/
 git submodule update --init --recursive libgmp/
 git submodule update --init --recursive libusb/
 git submodule update --init --recursive libzmq/
-git submodule update --init --recursive volk/ 
+git submodule update --init --recursive volk/
 git submodule update --init --recursive libffi/
 
 popd
@@ -44,7 +44,8 @@ download_deps() {
 #	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.58/glibmm-2.58.1.tar.xz
 #	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
 
-	popd
+#	popd
+echo "nothing to download"
 }
 
 install_jdk() {
@@ -57,5 +58,5 @@ install_jdk() {
 }
 
 recurse_submodules
-download_deps
+#download_deps
 install_jdk

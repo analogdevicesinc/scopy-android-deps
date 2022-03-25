@@ -15,12 +15,10 @@ rm_libs() {
 }
 create_strip_symlink() {
 #needed in NDK r23
-pushd $ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuild/linux-x86_64/bin
-mv aarch64-linux-android-strip aarch64-linux-android-strip2 || true
-ln -s llvm-strip aarch64-linux-android-strip
-popd
+#NDK r23 gradle uses wrong binary for stripping so we create a symlink to workaround it
+ln -s $STRIP $STRIPLINK
 }
 
 rm_libs
-#create_strip_symlink
+create_strip_symlink
 

@@ -2,13 +2,15 @@
 
 source ./build_system_setup.sh $2
 
-export NDK_VERSION=21.3.6528147
+export NDK_VERSION=23.1.7779620
+#export NDK_VERSION=21.3.6528147
 export API=26 # need ABI at least 28 for glob from my tests
+export APP_PLATFORM=${API}
 #export JOBS=$(getconf _NPROCESSORS_ONLN)
 export JOBS=9
 export HOST_ARCH=linux-x86_64
 
-if [ $# -ne 1 ]; then
+if [ $# -lt 1 ]; then
 	ARG1=aarch64
 else
 	ARG1=$1
@@ -78,6 +80,7 @@ export STRIP=$TOOLCHAIN/bin/llvm-strip
 export READELF=$TOOLCHAIN/bin/llvm-readelf
 export LD=$TOOLCHAIN/bin/ld.lld
 export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+export STRIPLINK=$TOOLCHAIN/bin/${TARGET_BINUTILS}-strip
 
 export CFLAGS="-I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"
 export STAGING_DIR=${DEV_PREFIX}

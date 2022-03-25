@@ -113,6 +113,7 @@ build_python() {
 	pushd $SCRIPT_HOME_DIR/python
 
 	# Python should be cross-built with the same version that is available on host, if nothing is available, it should be built with the script ./build_host_python
+	git clean -xdf
 	autoreconf
 	cp $BUILD_ROOT/android_configure.sh .
 	ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_func_pipe2=no ac_cv_func_fdatasync=no ac_cv_func_killpg=no ac_cv_func_waitid=no ac_cv_func_sigaltstack=no ./android_configure.sh  --build=x86_64-linux-gnu --disable-ipv6
@@ -121,7 +122,12 @@ build_python() {
 	sed -i "s/^#time/time/g" Modules/Setup
 	sed -i "s/^#_struct/_struct/g" Modules/Setup
 
-	make -j$JOBS LDFLAGS="$LDFLAGS -lintl -liconv -lz -lm"  install
+	if [ $ABI == "arm64-v8a" ]; then
+		LINTL=-lintl
+	fi
+
+	make -j$JOBS LDFLAGS="$LDFLAGS $LINTL -liconv -lz -lm"  install
+	rm -rf $DEV_PREFIX/lib/python3.8/test
 
 	popd
 

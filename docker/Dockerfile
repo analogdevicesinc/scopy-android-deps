@@ -32,9 +32,11 @@ ENV ANDROID_HOME /home/$USER/Android/Sdk
 WORKDIR /home/$USER/src/tools/bin
 
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} --licenses
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-26"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-28"
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "ndk;21.3.6528147"
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "ndk;23.1.7779620"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools"
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;28.0.3"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;30.0.3"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "cmdline-tools;latest"
 
@@ -52,14 +54,16 @@ RUN sudo apt remove qtchooser
 RUN sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
 WORKDIR /home/$USER/src
-RUN echo 14
+RUN echo 20
 RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch master
 
 WORKDIR /home/$USER/src/scopy-android-deps
 RUN ./move_libs.sh aarch64 $USER
+RUN ./move_libs.sh arm $USER
 RUN ./rename_gradle.sh $USER
 RUN ./download_deps_src.sh
 
 WORKDIR /home/$USER/src/scopy-android-deps
 ENV ANDROID_TOOLCHAIN_LOCATION=/home/$USER/src/scopy-android-deps
 RUN ./android_deps_build.sh aarch64 $USER
+RUN ./android_deps_build.sh arm $USER
