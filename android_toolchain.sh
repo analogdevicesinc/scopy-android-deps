@@ -6,6 +6,7 @@ export NDK_VERSION=23.1.7779620
 #export NDK_VERSION=21.3.6528147
 export API=26 # need ABI at least 28 for glob from my tests
 export APP_PLATFORM=${API}
+export ANDROID_SDK_BUILD_TOOLS=30.0.3
 #export JOBS=$(getconf _NPROCESSORS_ONLN)
 export JOBS=9
 export HOST_ARCH=linux-x86_64
