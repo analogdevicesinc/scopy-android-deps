@@ -2,8 +2,8 @@
 
 source ./build_system_setup.sh $2
 
-export NDK_VERSION=23.1.7779620
-#export NDK_VERSION=21.3.6528147
+#export NDK_VERSION=23.1.7779620
+export NDK_VERSION=21.3.6528147
 export API=26 # need ABI at least 28 for glob from my tests
 export APP_PLATFORM=${API}
 export ANDROID_SDK_BUILD_TOOLS=30.0.3
@@ -51,7 +51,8 @@ export TARGET_BINUTILS=i686-linux-android
 #################################
 fi
 
-export WORKDIR=$SCRIPT_HOME_DIR/deps_build_${TARGET_PREFIX}_$BUILD_TYPE
+export BUILDDIR=build_${TARGET_PREFIX}_api${API}_ndk${NDK_VERSION:0:2}_${BUILD_TYPE}
+export WORKDIR=$SCRIPT_HOME_DIR/$BUILDDIR
 
 # This is just an empty directory where I want the built objects to be installed
 export DEV_PREFIX=$WORKDIR/out
