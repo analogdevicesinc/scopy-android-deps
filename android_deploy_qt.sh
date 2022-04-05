@@ -2,7 +2,7 @@
 set -xe
 
 if [ $# -ne 1 ]; then
-        ARG1=build_${ABI}_${BUILD_TYPE}
+        ARG1=${BUILDDIR}
 else
         ARG1=$1
 fi

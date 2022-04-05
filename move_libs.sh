@@ -16,6 +16,7 @@ rm_libs() {
 create_strip_symlink() {
 #needed in NDK r23
 #NDK r23 gradle uses wrong binary for stripping so we create a symlink to workaround it
+rm -rf $STRIPLINK
 ln -s $STRIP $STRIPLINK
 }
 
