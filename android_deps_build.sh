@@ -9,9 +9,23 @@ reset_build_env() {
 	cd $WORKDIR
 }
 
+create_build_status_file() {
+	touch $BUILD_STATUS_FILE
+	echo "NDK - $NDK_VERSION" >> $BUILD_STATUS_FILE
+	echo "ANDROID API - $API" >> $BUILD_STATUS_FILE
+	echo "ABI - $ABI" >> $BUILD_STATUS_FILE
+	echo "JDK - $JDK" >> $BUILD_STATUS_FILE
+	echo "Qt - $QT_VERSION_STRING" >> $BUILD_STATUS_FILE
+	pushd $SCRIPT_HOME_DIR
+	echo "scopy-android-deps - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+	pushd $BUILD_ROOT
+	echo "gnuradio-android - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+}
+
 build_libm2k() {
 	pushd $SCRIPT_HOME_DIR/libm2k
 	git clean -xdf
+	export CURRENT_BUILD=libm2k
 
 	build_with_cmake -DENABLE_PYTHON=OFF
 
@@ -21,6 +35,7 @@ build_libm2k() {
 build_gr-m2k() {
 	pushd $SCRIPT_HOME_DIR/gr-m2k
 	git clean -xdf
+	export CURRENT_BUILD=gr-m2k
 
 	build_with_cmake -DWITH_PYTHON=OFF
 
@@ -30,6 +45,7 @@ build_gr-m2k() {
 build_gr-scopy() {
 	pushd $SCRIPT_HOME_DIR/gr-scopy
 	git clean -xdf
+	export CURRENT_BUILD=gr-scopy
 
 	build_with_cmake -DWITH_PYTHON=OFF
 
@@ -39,6 +55,7 @@ build_gr-scopy() {
 build_qwt() {
 	pushd $SCRIPT_HOME_DIR/qwt
 	git clean -xdf
+	export CURRENT_BUILD=qwt
 
 	$QMAKE ANDROID_ABIS="$ABI" ANDROID_MIN_SDK_VERSION=$API ANDROID_API_VERSION=$API INCLUDEPATH=$DEV_PREFIX/include LIBS=-L$DEV_PREFIX/lib qwt.pro
 	make -j$JOBS
@@ -59,6 +76,7 @@ move_boost_libs() {
 build_glib() {
 	pushd $SCRIPT_HOME_DIR/glib
 	git clean -xdf
+	export CURRENT_BUILD=glib
 
 	#CPPFLAGS=/path/to/standalone/include LDFLAGS=/path/to/standalone/lib ./configure \
 	#--prefix=/path/to/standalone --bindir=$AS_BIN --build=i686-pc-linux-gnu --host=arm-linux-androideabi \
@@ -81,6 +99,7 @@ build_glibmm() {
 	echo "### Building glibmm - 2.58.1"
 	pushd $SCRIPT_HOME_DIR/glibmm
 	git clean -xdf
+	export CURRENT_BUILD=glibmm
 
 	LDFLAGS="$LDFLAGS_COMMON -lffi -lz"
 	android_configure --disable-documentation
@@ -92,6 +111,7 @@ build_sigcpp() {
 	echo "### Building libsigc++ -2.10.0"
 	pushd $SCRIPT_HOME_DIR/libsigcplusplus
 	git clean -xdf
+	export CURRENT_BUILD=sigcpp
 
 	NOCONFIGURE=yes	./autogen.sh
 	android_configure --disable-documentation
@@ -102,6 +122,7 @@ build_sigcpp() {
 build_libsigrokdecode() {
 	pushd $SCRIPT_HOME_DIR/libsigrokdecode
 	git clean -xdf
+	export CURRENT_BUILD=libsigrokdecode
 
 	NOCONFIGURE=yes ./autogen.sh
 	android_configure
@@ -114,6 +135,7 @@ build_python() {
 
 	# Python should be cross-built with the same version that is available on host, if nothing is available, it should be built with the script ./build_host_python
 	git clean -xdf
+	export CURRENT_BUILD=python
 	autoreconf
 	cp $BUILD_ROOT/android_configure.sh .
 	ac_cv_file__dev_ptmx=no ac_cv_file__dev_ptc=no ac_cv_func_pipe2=no ac_cv_func_fdatasync=no ac_cv_func_killpg=no ac_cv_func_waitid=no ac_cv_func_sigaltstack=no ./android_configure.sh  --build=x86_64-linux-gnu --disable-ipv6
@@ -134,18 +156,20 @@ build_python() {
 }
 
 build_gr-iio3.8() {
-        pushd ${SCRIPT_HOME_DIR}/gr-iio-3.8
-        git clean -xdf
+	pushd ${SCRIPT_HOME_DIR}/gr-iio-3.8
+	git clean -xdf
+	export CURRENT_BUILD=gr-iio3.8
 
 	build_with_cmake -DWITH_PYTHON=OFF
 
-        popd
+	popd
 }
 
 build_log4cpp() {
 
 	pushd ${SCRIPT_HOME_DIR}/log4cpp
 	git clean -xdf
+	export CURRENT_BUILD=log4cpp
 	build_with_cmake
 	popd
 
@@ -154,6 +178,7 @@ build_log4cpp() {
 build_gnuradio3.8() {
 	pushd ${SCRIPT_HOME_DIR}/gnuradio-3.8
 	git clean -xdf
+	export CURRENT_BUILD=gnuradio3.8
 
 	rm -rf build
 	mkdir build
@@ -191,6 +216,7 @@ build_gnuradio3.8() {
 build_libtinyiiod() {
 	pushd $SCRIPT_HOME_DIR/libtinyiiod
 	git clean -xdf
+	export CURRENT_BUILD=libtinyiiod
 
 	cp $BUILD_ROOT/android_cmake.sh .
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
@@ -202,6 +228,8 @@ build_libtinyiiod() {
 build_qadvanceddocking() {
 	pushd $SCRIPT_HOME_DIR/qadvanceddocking
 	git clean -xdf
+	export CURRENT_BUILD=qtadvanceddocking
+
 	cp $BUILD_ROOT/android_cmake.sh .
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
 
@@ -210,6 +238,7 @@ build_qadvanceddocking() {
 }
 
 reset_build_env
+create_build_status_file
 build_libiconv
 build_libffi
 build_gettext
