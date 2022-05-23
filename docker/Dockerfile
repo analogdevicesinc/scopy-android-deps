@@ -33,11 +33,9 @@ WORKDIR /home/$USER/src/tools/bin
 
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} --licenses
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-26"
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-28"
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "ndk;21.3.6528147"
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "ndk;23.1.7779620"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools"
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;28.0.3"
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;30.0.3"
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;30.0.2"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "cmdline-tools;latest"
 
 RUN sudo ln -s /home/$USER/Android/Sdk/platform-tools/adb /usr/local/bin/adb
@@ -48,14 +46,14 @@ RUN chmod +x qt-unified-linux-x64-online.run
 ARG QT_USER
 ARG QT_PASSWORD
 
-RUN ./qt-unified-linux-x64-online.run install --ao --al --aa DownloadError=Retry -c -m $QT_USER --pw $QT_PASSWORD qt.qt5.5152.android qt.tools.cmake
+RUN ./qt-unified-linux-x64-online.run install --ao --al --aa DownloadError=Retry -c -m $QT_USER --pw $QT_PASSWORD qt.qt6.630.android qt.tools.cmake
 RUN sudo apt remove qtchooser
 
 RUN sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
 WORKDIR /home/$USER/src
-RUN echo 20
-RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch master
+RUN echo 22
+RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch gr-310-qt6
 
 WORKDIR /home/$USER/src/scopy-android-deps
 RUN ./move_libs.sh aarch64 $USER

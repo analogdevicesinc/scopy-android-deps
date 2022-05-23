@@ -11,6 +11,9 @@ git submodule update --init libm2k/
 git submodule update --init libsigrokdecode/
 git submodule update --init --recursive gr-iio-3.8/
 git submodule update --init --recursive gnuradio-3.8/
+git submodule update --init --recursive libsndfile/
+git submodule update --init --recursive spdlog/
+git submodule update --init --recursive gnuradio-3.10/
 git submodule update --init --recursive glibmm/
 git submodule update --init --recursive python/
 git submodule update --init --recursive libsigcplusplus/

@@ -2,11 +2,11 @@
 
 source ./build_system_setup.sh $2
 
-#export NDK_VERSION=23.1.7779620
-export NDK_VERSION=21.3.6528147
+export NDK_VERSION=23.1.7779620
+#export NDK_VERSION=21.3.6528147
 export API=26 # need ABI at least 28 for glob from my tests
 export APP_PLATFORM=${API}
-export ANDROID_SDK_BUILD_TOOLS=30.0.3
+export ANDROID_SDK_BUILD_TOOLS=30.0.2
 #export JOBS=$(getconf _NPROCESSORS_ONLN)
 export JOBS=9
 export HOST_ARCH=linux-x86_64
@@ -18,12 +18,20 @@ else
 fi
 
 TARGET_PREFIX=NO_ABI
+QT_INSTALL_PREFIX=${QT_INSTALL_PREFIX_NO_POSTFIX}
 
 if [ $ARG1 = "aarch64" ]; then
 ############ aarch64 #########
 export ABI=arm64-v8a
 export TARGET_PREFIX=aarch64-linux-android
 export TARGET_BINUTILS=aarch64-linux-android
+if [ ${QT_VERSION_STRING:0:1} -eq 6 ]; then
+	export QT_INSTALL_PREFIX=${QT_INSTALL_PREFIX}_arm64_v8a
+	export CMAKE_TOOLCHAIN_FILE=$QT_INSTALL_PREFIX/lib/cmake/Qt6/qt.toolchain.cmake
+else
+	export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+
+fi
 #############################
 fi
 
@@ -32,6 +40,13 @@ if [ $ARG1 = "arm" ]; then
 export ABI=armeabi-v7a
 export TARGET_PREFIX=armv7a-linux-androideabi
 export TARGET_BINUTILS=arm-linux-androideabi
+if [ ${QT_VERSION_STRING:0:1} -eq 6 ]; then
+	export QT_INSTALL_PREFIX=${QT_INSTALL_PREFIX}_armv7
+	export CMAKE_TOOLCHAIN_FILE=$QT_INSTALL_PREFIX/lib/cmake/Qt6/qt.toolchain.cmake
+else
+	export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+
+fi
 ###############################
 fi
 
@@ -40,6 +55,13 @@ if [ $ARG1 = "x86_64" ]; then
 export TARGET_BINUTILS=x86_64-linux-android
 export ABI=x86_64
 export TARGET_PREFIX=x86_64-linux-android
+if [ ${QT_VERSION_STRING:0:1} -eq 6 ]; then
+	export QT_INSTALL_PREFIX=${QT_INSTALL_PREFIX}_x86_64
+	export CMAKE_TOOLCHAIN_FILE=$QT_INSTALL_PREFIX/lib/cmake/Qt6/qt.toolchain.cmake
+else
+	export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+
+fi
 #################################
 fi
 
@@ -48,6 +70,13 @@ if [ $ARG1 = "x86" ]; then
 export TARGET_PREFIX=i686-linux-android
 export ABI=x86
 export TARGET_BINUTILS=i686-linux-android
+if [ ${QT_VERSION_STRING:0:1} -eq 6 ]; then
+	export QT_INSTALL_PREFIX=${QT_INSTALL_PREFIX}_x86
+	export CMAKE_TOOLCHAIN_FILE=$QT_INSTALL_PREFIX/lib/cmake/Qt6/qt.toolchain.cmake
+else
+	export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
+
+fi
 #################################
 fi
 
@@ -63,7 +92,7 @@ export ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION
 export TOOLCHAIN=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/$HOST_ARCH
 export TOOLCHAIN_BIN=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${HOST_ARCH}/bin
 export QMAKE=$QT_INSTALL_PREFIX/bin/qmake
-export ANDROID_QT_DEPLOY=$QT_INSTALL_PREFIX/bin/androiddeployqt
+export ANDROID_QT_DEPLOY=$QT_INSTALL_PREFIX/../gcc_64/bin/androiddeployqt
 
 # Apparently android-8 works fine, there are other versions, look them up
 export SYSROOT=$TOOLCHAIN/sysroot

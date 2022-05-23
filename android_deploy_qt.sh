@@ -12,9 +12,10 @@ copy-all-libs-from-staging() {
 	cp $DEV_PREFIX/lib/*.so ./android/libs/$ABI
 }
 copy-missing-qt-libs() {
-	echo -- Copying missing qt5 libraries to the android-build - for some reason android-qt-deploy does not correctly deploy all the libraries
+	echo -- Copying missing qt6 libraries to the android-build - for some reason android-qt-deploy does not correctly deploy all the libraries
 	echo -- We are now deploying all the qt libraries - TODO only deploy the ones that are actually used
-	cp $QT_INSTALL_PREFIX/lib/libQt5*_$ABI.so $ARG1/android-build/libs/$ABI
+	#cp $QT_INSTALL_PREFIX/lib/libQt6*_$ABI.so $ARG1/android-build/libs/$ABI
+	#cp $QT_INSTALL_PREFIX/lib/libQt6*_$ABI.so $ARG1/../android/libs/$ABI
 
 }
 copy-libsigrokdecode() {
@@ -33,7 +34,8 @@ copy-iio-emu() {
 }
 
 copy-all-libs-from-staging
-copy-missing-qt-libs
+#copy-missing-qt-libs
 copy-libsigrokdecode
 copy-iio-emu
-$ANDROID_QT_DEPLOY --input $ARG1/android_deployment_settings.json --output $ARG1/android-build --android-platform android-$API --jdk $JDK --gradle --verbose
+
+#$ANDROID_QT_DEPLOY --output $ARG1/android-build --input $ARG1/android-scopy-deployment-settings.json --android-platform android-$API --jdk $JDK --verbose --depfile $ARG1/scopy.d --builddir $ARG1/android-build --apk $ARG1/android-build/scopy.apk

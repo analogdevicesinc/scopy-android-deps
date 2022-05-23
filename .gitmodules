@@ -43,3 +43,12 @@
 [submodule "qadvanceddocking"]
 	path = qadvanceddocking
 	url = https://github.com/cseci/Qt-Advanced-Docking-System
+[submodule "libsndfile"]
+	path = libsndfile
+	url = https://github.com/libsndfile/libsndfile
+[submodule "spdlog"]
+	path = spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "gnuradio-3.10"]
+	path = gnuradio-3.10
+	url = https://github.com/gnuradio/gnuradio

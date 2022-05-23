@@ -3,10 +3,12 @@ set -xe
 source ./build_system_setup.sh $1
 
 rename_gradle() {
-	echo "Patching to use gradle-6.3"
+	echo "Patching to use gradle-7.4"
 
-	pushd $QT_INSTALL_PREFIX/src/3rdparty/gradle/gradle/wrapper
-	sed -i "s|https\\\:\/\/services\.gradle\.org\/distributions\/gradle.*\.zip|https\://services.gradle.org/distributions/gradle-6.3-all.zip|g" gradle-wrapper.properties
+	pushd $QT_INSTALL_PREFIX_NO_POSTFIX_arm64_v8a/src/3rdparty/gradle/gradle/wrapper
+	sed -i "s|https\\\:\/\/services\.gradle\.org\/distributions\/gradle.*\.zip|https\://services.gradle.org/distributions/gradle-7.4-all.zip|g" gradle-wrapper.properties
+	pushd $QT_INSTALL_PREFIX_NO_POSTFIX_armv7a/src/3rdparty/gradle/gradle/wrapper
+	sed -i "s|https\\\:\/\/services\.gradle\.org\/distributions\/gradle.*\.zip|https\://services.gradle.org/distributions/gradle-7.4-all.zip|g" gradle-wrapper.properties
 	popd
 }
 
@@ -21,6 +23,6 @@ patch_sdk_build_tools_revision() {
 	popd
 }
 
-rename_gradle
-patch_sdk_build_tools_revision
+#rename_gradle
+#patch_sdk_build_tools_revision
 

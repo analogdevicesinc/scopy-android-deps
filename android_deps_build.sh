@@ -27,7 +27,7 @@ build_libm2k() {
 	git clean -xdf
 	export CURRENT_BUILD=libm2k
 
-	build_with_cmake -DENABLE_PYTHON=OFF
+	build_with_cmake -DENABLE_PYTHON=OFF -DENABLE_TOOLS=ON
 
 	popd
 }
@@ -67,6 +67,7 @@ build_qwt() {
 move_qwt_libs (){
 	cp -R $DEV_PREFIX/usr/local/* $DEV_PREFIX/
 	cp -R $DEV_PREFIX/libs/$ABI/* $DEV_PREFIX/lib # another hack
+	cp -R $QT_INSTALL_PREFIX/lib/libQt6PrintSupport*.so $DEV_PREFIX/lib
 }
 
 move_boost_libs() {
@@ -213,6 +214,75 @@ build_gnuradio3.8() {
 	make install
 	popd
 }
+
+build_spdlog() {
+	pushd ${SCRIPT_HOME_DIR}/spdlog
+	git clean -xdf
+	export CURRENT_BUILD=spdlog
+
+	rm -rf build
+	mkdir build
+	cd build
+	build_with_cmake  \
+	-DSPDLOG_BUILD_SHARED=ON \
+	../
+
+
+	make -j ${JOBS}
+	make install
+	popd
+
+}
+
+build_libsndfile() {
+
+	pushd ${SCRIPT_HOME_DIR}/libsndfile
+	git clean -xdf
+	export CURRENT_BUILD=libsndfile
+
+	rm -rf build
+	mkdir build
+	cd build
+
+	echo "$LDFLAGS_COMMON"
+
+	build_with_cmake ../
+	make
+	make install
+
+}
+build_gnuradio3.10() {
+	pushd ${SCRIPT_HOME_DIR}/gnuradio-3.10
+	git clean -xdf
+	export CURRENT_BUILD=gnuradio3.10
+
+	rm -rf build
+	mkdir build
+	cd build
+
+	echo "$LDFLAGS_COMMON"
+
+	build_with_cmake  \
+	  -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+	  -DENABLE_INTERNAL_VOLK=OFF \
+	  -DBOOST_ROOT=${PREFIX} \
+	  -DBoost_COMPILER=-clang \
+	  -DBoost_USE_STATIC_LIBS=ON \
+	  -DBoost_ARCHITECTURE=-a32 \
+	  -DCMAKE_FIND_ROOT_PATH=${PREFIX} \
+	  -DENABLE_DOXYGEN=OFF, \
+	  -DENABLE_DEFAULT=OFF, \
+	  -DENABLE_GNURADIO_RUNTIME=ON \
+	  -DENABLE_GR_ANALOG=ON,\
+	  -DENABLE_GR_BLOCKS=ON,\
+	  -DENABLE_GR_FFT=ON,\
+	  -DENABLE_GR_FILTER=ON,\
+	  -DENABLE_GR_IIO=ON \
+ 	   ../
+	make -j ${JOBS}
+	make install
+	popd
+}
 build_libtinyiiod() {
 	pushd $SCRIPT_HOME_DIR/libtinyiiod
 	git clean -xdf
@@ -256,10 +326,11 @@ build_libusb
 build_libiio
 build_libad9361
 build_libm2k
+build_spdlog
 build_volk
 #build_log4cpp # not used
-build_gnuradio3.8
-build_gr-iio3.8
+build_libsndfile
+build_gnuradio3.10
 build_gr-scopy
 build_gr-m2k
 build_qwt
