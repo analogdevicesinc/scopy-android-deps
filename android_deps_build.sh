@@ -67,7 +67,7 @@ build_qwt() {
 move_qwt_libs (){
 	cp -R $DEV_PREFIX/usr/local/* $DEV_PREFIX/
 	cp -R $DEV_PREFIX/libs/$ABI/* $DEV_PREFIX/lib # another hack
-	cp -R $QT_INSTALL_PREFIX/lib/libQt6PrintSupport*.so $DEV_PREFIX/lib
+	cp -R $QT_INSTALL_PREFIX/lib/libQt5PrintSupport*.so $DEV_PREFIX/lib
 }
 
 move_boost_libs() {

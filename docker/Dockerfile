@@ -46,14 +46,14 @@ RUN chmod +x qt-unified-linux-x64-online.run
 ARG QT_USER
 ARG QT_PASSWORD
 
-RUN ./qt-unified-linux-x64-online.run install --ao --al --aa DownloadError=Retry -c -m $QT_USER --pw $QT_PASSWORD qt.qt6.630.android qt.tools.cmake
+RUN ./qt-unified-linux-x64-online.run install --ao --al --aa DownloadError=Retry -c -m $QT_USER --pw $QT_PASSWORD qt.qt5.5152.android qt.tools.cmake
 RUN sudo apt remove qtchooser
 
 RUN sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
 WORKDIR /home/$USER/src
 RUN echo 22
-RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch gr-310-qt6
+RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch qt5-gr3.10 
 
 WORKDIR /home/$USER/src/scopy-android-deps
 RUN ./move_libs.sh aarch64 $USER

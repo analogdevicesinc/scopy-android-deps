@@ -18,7 +18,7 @@ else
 fi
 
 TARGET_PREFIX=NO_ABI
-QT_INSTALL_PREFIX=${QT_INSTALL_PREFIX_NO_POSTFIX}
+export QT_INSTALL_PREFIX=${QT_INSTALL_PREFIX_NO_POSTFIX}
 
 if [ $ARG1 = "aarch64" ]; then
 ############ aarch64 #########
@@ -92,7 +92,7 @@ export ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION
 export TOOLCHAIN=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/$HOST_ARCH
 export TOOLCHAIN_BIN=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${HOST_ARCH}/bin
 export QMAKE=$QT_INSTALL_PREFIX/bin/qmake
-export ANDROID_QT_DEPLOY=$QT_INSTALL_PREFIX/../gcc_64/bin/androiddeployqt
+export ANDROID_QT_DEPLOY=$QT_INSTALL_PREFIX/bin/androiddeployqt
 
 # Apparently android-8 works fine, there are other versions, look them up
 export SYSROOT=$TOOLCHAIN/sysroot
@@ -127,7 +127,6 @@ echo JDK=$JDK
 echo NDK_VERSION=$NDK_VERSION
 echo JOBS=$JOBS
 echo SCRIPT_HOME_DIR=$SCRIPT_HOME_DIR
-#echo
 echo $TARGET_PREFIX$API
 #if [ $TARGET_PREFIX = "NO_ABI" ]; then
 #	exit 22 # Invalid argument
