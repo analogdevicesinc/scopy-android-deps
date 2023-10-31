@@ -2,14 +2,17 @@
 
 source ./build_system_setup.sh $2
 
-export NDK_VERSION=23.1.7779620
-#export NDK_VERSION=21.3.6528147
-export API=26 # need ABI at least 28 for glob from my tests
+export NDK_VERSION=25.2.9519653
+
+export API=30 # need ABI at least 28 for glob from my tests
 export APP_PLATFORM=${API}
-export ANDROID_SDK_BUILD_TOOLS=30.0.2
+export ANDROID_SDK_BUILD_TOOLS=33.0.1
 #export JOBS=$(getconf _NPROCESSORS_ONLN)
-export JOBS=9
+export JOBS=14
 export HOST_ARCH=linux-x86_64
+
+export STRIPPING=ON;
+export CLEANBUILDDIR=ON;
 
 if [ $# -lt 1 ]; then
 	ARG1=aarch64
@@ -116,7 +119,9 @@ export STRIPLINK=$TOOLCHAIN/bin/${TARGET_BINUTILS}-strip
 export CFLAGS="-I${SYSROOT}/include -I${SYSROOT}/usr/include -I${TOOLCHAIN}/include -I${DEV_PREFIX}/include -fPIC"
 export STAGING_DIR=${DEV_PREFIX}
 export CPPFLAGS="-fexceptions -frtti ${CFLAGS} "
-export LDFLAGS_COMMON="-L${SYSROOT}/usr/lib/$TARGET_BINUTILS/$API -L${TOOLCHAIN}/lib -L${DEV_PREFIX} -L${DEV_PREFIX}/lib"
+# !!!!!!!! https://android.googlesource.com/platform/ndk/+/master/docs/BuildSystemMaintainers.md#Unwinding
+# TBD Which libraries should link unwind manually
+export LDFLAGS_COMMON="-L${DEV_PREFIX} -L${DEV_PREFIX}/lib -L${SYSROOT}/usr/lib/$TARGET_BINUTILS/$API -L${TOOLCHAIN}/lib -lunwind"
 export LDFLAGS="$LDFLAGS_COMMON"
 export BUILD_STATUS_FILE=$WORKDIR/build-status
 

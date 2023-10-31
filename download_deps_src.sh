@@ -62,4 +62,4 @@ install_jdk() {
 
 recurse_submodules
 #download_deps
-install_jdk
+#install_jdk

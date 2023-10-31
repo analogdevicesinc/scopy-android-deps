@@ -5,7 +5,7 @@ ARG USER=runner
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
-RUN apt-get install -y git vim wget unzip sudo xserver-xorg openjdk-11-jre cmake libtool build-essential pkg-config autogen bison flex texinfo python-dev python-mako python-six swig3.0 python3-mako python3-numpy gettext libglib2.0-dev texinfo subversion libxkbcommon-x11-0 libxcb-xinerama0 libqt5gui5 libncurses5 autoconf-archive mm-common
+RUN apt-get install -y git vim wget unzip sudo xserver-xorg openjdk-17-jre cmake libtool build-essential ninja-build pkg-config autogen bison flex texinfo python-dev pip python-mako python-six swig3.0 python3-mako python3-numpy gettext libglib2.0-dev texinfo subversion libxkbcommon-x11-0 libxcb-xinerama0 libqt5gui5 libncurses5 autoconf-archive mm-common
 
 RUN groupadd -g 1000 -r $USER
 RUN useradd -u 1000 -g 1000 --create-home -r $USER
@@ -32,10 +32,10 @@ ENV ANDROID_HOME /home/$USER/Android/Sdk
 WORKDIR /home/$USER/src/tools/bin
 
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} --licenses
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-26"
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "ndk;23.1.7779620"
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-30"
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "ndk;25.2.9519653"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools"
-RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;30.0.2"
+RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;33.0.1"
 RUN yes | ./sdkmanager --sdk_root=${ANDROID_HOME} "cmdline-tools;latest"
 
 RUN sudo ln -s /home/$USER/Android/Sdk/platform-tools/adb /usr/local/bin/adb
@@ -52,16 +52,11 @@ RUN sudo apt remove qtchooser
 RUN sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
 WORKDIR /home/$USER/src
-RUN echo 22
-RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch qt5-gr3.10 
+RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git --branch qt5-gr3.10 --recursive
 
 WORKDIR /home/$USER/src/scopy-android-deps
-RUN ./move_libs.sh aarch64 $USER
-RUN ./move_libs.sh arm $USER
-RUN ./rename_gradle.sh $USER
-RUN ./download_deps_src.sh
+RUN ./build_androiddeployqt.sh
 
 WORKDIR /home/$USER/src/scopy-android-deps
 ENV ANDROID_TOOLCHAIN_LOCATION=/home/$USER/src/scopy-android-deps
 RUN ./android_deps_build.sh aarch64 $USER
-RUN ./android_deps_build.sh arm $USER

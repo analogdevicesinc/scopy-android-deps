@@ -59,7 +59,9 @@ build_qwt() {
 
 	$QMAKE ANDROID_ABIS="$ABI" ANDROID_MIN_SDK_VERSION=$API ANDROID_API_VERSION=$API INCLUDEPATH=$DEV_PREFIX/include LIBS=-L$DEV_PREFIX/lib qwt.pro
 	make -j$JOBS
+	strip
 	make -j$JOBS INSTALL_ROOT=$DEV_PREFIX install
+	clean
 	popd
 
 }
@@ -74,37 +76,63 @@ move_boost_libs() {
 	cp -R $DEV_PREFIX/$ABI/* $DEV_PREFIX
 }
 
+
+meson_flag_list()
+{
+	while (( "$#" )); do
+		echo -n "'$1'";
+		if [ $# -gt 1 ]; then
+			echo -n ",";
+		fi
+		shift
+	done
+}
+
 build_glib() {
 	pushd $SCRIPT_HOME_DIR/glib
 	git clean -xdf
 	export CURRENT_BUILD=glib
+echo "
+[host_machine]
+system = 'android'
+cpu_family = '$ABI'
+cpu = '$ABI'
+endian = 'little'
 
-	#CPPFLAGS=/path/to/standalone/include LDFLAGS=/path/to/standalone/lib ./configure \
-	#--prefix=/path/to/standalone --bindir=$AS_BIN --build=i686-pc-linux-gnu --host=arm-linux-androideabi \
-	#--cache-file=android.cache
+[properties]
+pkg_config_libdir = '$DEV_PREFIX/lib/pkgconfig'
+sys_root = '$SYSROOT'
 
-echo "glib_cv_stack_grows=no
-glib_cv_uscore=no
-ac_cv_func_posix_getpwuid_r=no
-ac_cv_func_posix_getgrgid_r=no " > android.cache
+[binaries]
+c = '$CC'
+cpp = '$CC'
+cxx = '$CXX'
+ar = '$AR'
+as = '$AS'
+ld = '$LD'
+nm = '$NM'
+strip = '$STRIPLINK'
+pkgconfig = '$(which pkg-config)'
 
-	NOCONFIGURE=yes ./autogen.sh
+[built-in options]
+c_std = 'c17'
+prefix = '$DEV_PREFIX'
+c_args = [$(meson_flag_list $CFLAGS)]
+cpp_args = [$(meson_flag_list $CPPFLAGS)]
+c_link_args = [$(meson_flag_list $LDFLAGS)]
+pkg_config_path = '$DEV_PREFIX/lib/pkgconfig'
+default_library = 'shared'
+" > cross_file.txt
 
-	LDFLAGS="$LDFLAGS_COMMON -lffi -lz"
-	android_configure --cache-file=android.cache --with-libiconv=gnu --disable-dtrace --disable-xattr --disable-systemtap --with-pcre=internal --enable-libmount=no
-
-	popd
-}
-
-build_glibmm() {
-	echo "### Building glibmm - 2.58.1"
-	pushd $SCRIPT_HOME_DIR/glibmm
-	git clean -xdf
-	export CURRENT_BUILD=glibmm
-
-	LDFLAGS="$LDFLAGS_COMMON -lffi -lz"
-	android_configure --disable-documentation
-
+	pip3 install meson
+	mkdir -p $SCRIPT_HOME_DIR/glib/build
+	~/.local/bin/meson setup --cross-file cross_file.txt build
+	cd $SCRIPT_HOME_DIR/glib/build
+	~/.local/bin/meson compile
+	strip
+	~/.local/bin/meson install
+	cd $SCRIPT_HOME_DIR/glib
+	clean
 	popd
 }
 
@@ -116,7 +144,6 @@ build_sigcpp() {
 
 	NOCONFIGURE=yes	./autogen.sh
 	android_configure --disable-documentation
-
 	popd
 }
 
@@ -127,7 +154,6 @@ build_libsigrokdecode() {
 
 	NOCONFIGURE=yes ./autogen.sh
 	android_configure
-
 	popd
 }
 
@@ -156,16 +182,6 @@ build_python() {
 
 }
 
-build_gr-iio3.8() {
-	pushd ${SCRIPT_HOME_DIR}/gr-iio-3.8
-	git clean -xdf
-	export CURRENT_BUILD=gr-iio3.8
-
-	build_with_cmake -DWITH_PYTHON=OFF
-
-	popd
-}
-
 build_log4cpp() {
 
 	pushd ${SCRIPT_HOME_DIR}/log4cpp
@@ -174,45 +190,6 @@ build_log4cpp() {
 	build_with_cmake
 	popd
 
-}
-
-build_gnuradio3.8() {
-	pushd ${SCRIPT_HOME_DIR}/gnuradio-3.8
-	git clean -xdf
-	export CURRENT_BUILD=gnuradio3.8
-
-	rm -rf build
-	mkdir build
-	cd build
-
-	echo "$LDFLAGS_COMMON"
-
-	build_with_cmake  \
-	  -DPYTHON_EXECUTABLE=/usr/bin/python3 \
-	  -DENABLE_INTERNAL_VOLK=OFF \
-	  -DBOOST_ROOT=${PREFIX} \
-	  -DBoost_COMPILER=-clang \
-	  -DBoost_USE_STATIC_LIBS=ON \
-	  -DBoost_ARCHITECTURE=-a32 \
-	  -DCMAKE_FIND_ROOT_PATH=${PREFIX} \
-	  -DENABLE_DOXYGEN=OFF \
-	  -DENABLE_SPHINX=OFF \
-	  -DENABLE_PYTHON=OFF \
-	  -DENABLE_TESTING=OFF \
-	  -DENABLE_GR_FEC=OFF \
-	  -DENABLE_GR_AUDIO=OFF \
-	  -DENABLE_GR_DTV=OFF \
-	  -DENABLE_GR_CHANNELS=OFF \
-	  -DENABLE_GR_VOCODER=OFF \
-	  -DENABLE_GR_TRELLIS=OFF \
-	  -DENABLE_GR_WAVELET=OFF \
-	  -DENABLE_GR_CTRLPORT=OFF \
-	  -DENABLE_CTRLPORT_THRIFT=OFF \
-	  -DCMAKE_VERBOSE_MAKEFILE=ON \
-	   ../
-	make -j ${JOBS}
-	make install
-	popd
 }
 
 build_spdlog() {
@@ -226,10 +203,6 @@ build_spdlog() {
 	build_with_cmake  \
 	-DSPDLOG_BUILD_SHARED=ON \
 	../
-
-
-	make -j ${JOBS}
-	make install
 	popd
 
 }
@@ -247,9 +220,6 @@ build_libsndfile() {
 	echo "$LDFLAGS_COMMON"
 
 	build_with_cmake ../
-	make
-	make install
-
 }
 build_gnuradio3.10() {
 	pushd ${SCRIPT_HOME_DIR}/gnuradio-3.10
@@ -268,19 +238,17 @@ build_gnuradio3.10() {
 	  -DBOOST_ROOT=${PREFIX} \
 	  -DBoost_COMPILER=-clang \
 	  -DBoost_USE_STATIC_LIBS=ON \
-	  -DBoost_ARCHITECTURE=-a32 \
+	  -DBoost_ARCHITECTURE=-a64 \
 	  -DCMAKE_FIND_ROOT_PATH=${PREFIX} \
-	  -DENABLE_DOXYGEN=OFF, \
-	  -DENABLE_DEFAULT=OFF, \
+	  -DENABLE_DOXYGEN=OFF \
+	  -DENABLE_DEFAULT=OFF \
 	  -DENABLE_GNURADIO_RUNTIME=ON \
-	  -DENABLE_GR_ANALOG=ON,\
-	  -DENABLE_GR_BLOCKS=ON,\
-	  -DENABLE_GR_FFT=ON,\
-	  -DENABLE_GR_FILTER=ON,\
+	  -DENABLE_GR_ANALOG=ON \
+	  -DENABLE_GR_BLOCKS=ON \
+	  -DENABLE_GR_FFT=ON \
+	  -DENABLE_GR_FILTER=ON \
 	  -DENABLE_GR_IIO=ON \
  	   ../
-	make -j ${JOBS}
-	make install
 	popd
 }
 build_libtinyiiod() {
@@ -315,11 +283,10 @@ build_gettext
 build_libiconv # HANDLE CIRCULAR DEP
 build_glib
 build_sigcpp
-build_glibmm
 build_libxml2
 build_boost
 move_boost_libs
-#build_libzmq
+build_libzmq
 build_fftw
 build_libgmp
 build_libusb

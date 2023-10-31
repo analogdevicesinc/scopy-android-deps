@@ -36,7 +36,7 @@
 	url = https://github.com/analogdevicesinc/gr-iio
 [submodule "glib"]
 	path = glib
-	url = https://github.com/cseci/glib
+	url = https://github.com/GNOME/glib
 [submodule "log4cpp"]
 	path = log4cpp
 	url = https://github.com/cseci/log4cpp
@@ -51,4 +51,4 @@
 	url = https://github.com/gabime/spdlog
 [submodule "gnuradio-3.10"]
 	path = gnuradio-3.10
-	url = https://github.com/gnuradio/gnuradio
+	url = https://github.com/analogdevicesinc/gnuradio
