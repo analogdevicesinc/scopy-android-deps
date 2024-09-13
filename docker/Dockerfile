@@ -1,4 +1,3 @@
-#docker build -t analogdevices/scopy-build:android --build-arg QT_USER=<your_user> --build-arg QT_PASSWORD=<your_password> .
 FROM ubuntu:20.04
 
 ARG USER=runner
@@ -83,13 +82,16 @@ RUN set -ex && \
     # Symlink adb binary
     sudo ln -s /home/$USER/Android/Sdk/platform-tools/adb /usr/local/bin/adb
 
-# Download and install Qt
-ARG QT_USER
-ARG QT_PASSWORD
-RUN set -ex && \
+RUN --mount=type=secret,id=qt_user,uid=1000,target=/run/secrets/qt_user \
+    --mount=type=secret,id=qt_password,uid=1000,target=/run/secrets/qt_password \
+    set -ex && \ 
     wget https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run && \
     chmod +x qt-unified-linux-x64-online.run && \
-    ./qt-unified-linux-x64-online.run install --ao --al --aa DownloadError=Retry -c -m $QT_USER --pw $QT_PASSWORD qt.qt5.5152.android qt.tools.cmake && \
+    ./qt-unified-linux-x64-online.run install \
+        --ao --al --aa DownloadError=Retry -c \
+        -m $(cat /run/secrets/qt_user) \
+        --pw $(cat /run/secrets/qt_password) \
+        qt.qt5.5152.android qt.tools.cmake && \
     rm qt-unified-linux-x64-online.run && \
     sudo apt remove -y qtchooser && \
     # Symlink Qt Creator binary

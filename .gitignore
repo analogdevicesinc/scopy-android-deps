@@ -13,3 +13,4 @@ out/*
 **/deps*
 **/build*
 downloads/*
+docker/qt_*
