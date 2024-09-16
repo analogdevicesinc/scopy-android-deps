@@ -12,7 +12,7 @@
 	url = https://github.com/analogdevicesinc/gr-scopy
 [submodule "libsigrokdecode"]
 	path = libsigrokdecode
-	url = https://github.com/sigrokproject/libsigrokdecode.git
+	url = https://github.com/analogdevicesinc/libsigrokdecode.git
 [submodule "libtinyiiod"]
 	path = libtinyiiod
 	url = https://github.com/analogdevicesinc/libtinyiiod.git
